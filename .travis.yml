@@ -26,7 +26,10 @@ git:
 #  - if [ $TRAVIS_OS_NAME = osx ]; then brew install gcc; fi
 
 ## uncomment the following lines to override the default test script
-#script:
+script:
+ - julia -e 'Pkg.clone("https://github.com/awllee/SequentialMonteCarlo.jl.git"); Pkg.build("SequentialMonteCarlo")'
+ - julia -e 'Pkg.clone(pwd()); Pkg.build("SMCExamples")'
+ - JULIA_NUM_THREADS=2 julia -e 'Pkg.test("SMCExamples"; coverage=true)'
 #  - julia -e 'Pkg.clone(pwd()); Pkg.build("SMCExamples"); Pkg.test("SMCExamples"; coverage=true)'
 after_success:
   # push coverage results to Coveralls
