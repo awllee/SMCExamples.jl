@@ -1,9 +1,7 @@
 using SequentialMonteCarlo
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel, kalmanlogZ
-
-VERSION.minor == 6 && using Base.Test
-VERSION.minor > 6 && using Test
+using Compat.Test
 
 setSMCRNGs(0)
 

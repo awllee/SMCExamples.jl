@@ -1,5 +1,4 @@
-VERSION.minor == 6 && using Base.Test
-VERSION.minor > 6 && using Test
+using Compat.Test
 
 @testset "Finite FK Model tests" begin
   include("ffk_test.jl")

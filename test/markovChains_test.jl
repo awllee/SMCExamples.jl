@@ -1,8 +1,6 @@
 using SMCExamples.MarkovChains
 using StaticArrays
-
-VERSION.minor == 6 && using Base.Test
-VERSION.minor > 6 && using Test
+using Compat.Test
 
 ## demo with a MV normal target
 
