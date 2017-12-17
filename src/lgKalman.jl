@@ -5,6 +5,8 @@ struct KalmanOut
   predictionVariances::Vector{Float64}
   filteringMeans::Vector{Float64}
   filteringVariances::Vector{Float64}
+  smoothingMeans::Vector{Float64}
+  smoothingVariances::Vector{Float64}
   logZhats::Vector{Float64}
 end
 
@@ -22,11 +24,11 @@ function kalman(theta::LGTheta, ys::Vector{Float64})
   R = theta.R
   x0 = theta.x0
   v0 = theta.v0
-  predictionMeans = Vector{Float64}(n)
-  predictionVariances = Vector{Float64}(n)
-  filteringMeans = Vector{Float64}(n)
-  filteringVariances = Vector{Float64}(n)
-  logZhats = Vector{Float64}(n)
+  predictionMeans = Vector{Float64}(uninitialized, n)
+  predictionVariances = Vector{Float64}(uninitialized, n)
+  filteringMeans = Vector{Float64}(uninitialized, n)
+  filteringVariances = Vector{Float64}(uninitialized, n)
+  logZhats = Vector{Float64}(uninitialized, n)
   mutt1 = 0.0
   mutt = 0.0
   sigmatt1 = 0.0
@@ -50,8 +52,19 @@ function kalman(theta::LGTheta, ys::Vector{Float64})
     filteringMeans[p] = mutt
     filteringVariances[p] = sigmatt
   end
-  return KalmanOut(predictionMeans,predictionVariances,filteringMeans,
-        filteringVariances,logZhats)
+  smoothingMeans = Vector{Float64}(uninitialized, n)
+  smoothingVariances = Vector{Float64}(uninitialized, n)
+  smoothingMeans[n] = filteringMeans[n]
+  smoothingVariances[n] = filteringVariances[n]
+  for p = n:-1:2
+    J = filteringVariances[p-1] * A * inv(predictionVariances[p])
+    smoothingMeans[p-1] = filteringMeans[p-1] +
+      J * (smoothingMeans[p] - predictionMeans[p])
+    smoothingVariances[p-1] = filteringVariances[p-1] +
+      J * (smoothingVariances[p] - predictionVariances[p]) * J
+  end
+  return KalmanOut(predictionMeans, predictionVariances, filteringMeans,
+        filteringVariances, smoothingMeans, smoothingVariances, logZhats)
 end
 
 function kalmanlogZ(theta::LGTheta, ys::Vector{Float64})

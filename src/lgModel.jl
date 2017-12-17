@@ -4,6 +4,7 @@ module LinearGaussian
 
 using SequentialMonteCarlo
 import SMCExamples.Particles.Float64Particle
+import Compat.uninitialized
 
 struct LGTheta
   A::Float64
@@ -36,8 +37,8 @@ function makeLGModel(theta::LGTheta, ys::Vector{Float64})
 end
 
 function simulateLGModel(theta::LGTheta, n::Int64)
-  model = makeLGModel(theta, Vector{Float64}(0))
-  ys = Vector{Float64}(n)
+  model = makeLGModel(theta, Vector{Float64}(uninitialized, 0))
+  ys = Vector{Float64}(uninitialized, n)
   xParticle = Float64Particle()
   rng = getSMCRNG()
   for p in 1:n

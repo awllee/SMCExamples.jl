@@ -6,6 +6,7 @@ module FiniteFeynmanKac
 using SequentialMonteCarlo
 using StaticArrays
 import SMCExamples.Particles.Int64Particle
+import Compat.uninitialized
 
 struct FiniteFK{d}
   mu::SVector{d, Float64}
@@ -57,8 +58,8 @@ function randomFiniteFK(d::Int64, n::Int64)
   mu = rand(rng, d)
   mu ./= sum(mu)
 
-  Ms = Vector{SMatrix{d, d, Float64}}(n - 1)
-  Gs = Vector{SVector{d, Float64}}(n)
+  Ms = Vector{SMatrix{d, d, Float64}}(uninitialized, n - 1)
+  Gs = Vector{SVector{d, Float64}}(uninitialized, n)
   for p = 1:n-1
     tmp = rand(rng, d, d)
     for i = 1:d
@@ -83,10 +84,10 @@ end
 
 function calculateEtasZs(fk::FiniteFK{d}) where d
   n::Int64 = length(fk.Gs)
-  etas = Vector{SVector{d, Float64}}(n)
-  etahats = Vector{SVector{d, Float64}}(n)
-  logZhats = Vector{Float64}(n)
-  etaGs = Vector{Float64}(n)
+  etas = Vector{SVector{d, Float64}}(uninitialized, n)
+  etahats = Vector{SVector{d, Float64}}(uninitialized, n)
+  logZhats = Vector{Float64}(uninitialized, n)
+  etaGs = Vector{Float64}(uninitialized, n)
   etas[1] = fk.mu
   tmp = MVector{d, Float64}()
   tmp .= etas[1] .* fk.Gs[1]
