@@ -9,6 +9,8 @@ using Compat.LinearAlgebra
 using Compat.Random
 using Compat
 
+if VERSION.minor == 6 mul! = A_mul_B! end
+
 struct MVLGTheta{d}
   A::SMatrix{d, d, Float64}
   Q::SMatrix{d, d, Float64}
@@ -37,13 +39,9 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
   logncG = - 0.5 * d * log(2 * π) - 0.5 * logdet(theta.R)
   @inline function lG(p::Int64, particle::MVFloat64Particle{d},
     scratch::MVLGPScratch{d})
-    # v = theta.C*particle.x - ys[p]
-    # return logncG - dot(v,invRover2 * v)
-    A_mul_B!(scratch.t1, theta.C, particle.x)
-    # Compat.mul!(scratch.t1, theta.C, particle.x)
+    mul!(scratch.t1, theta.C, particle.x)
     @inbounds scratch.t2 .= scratch.t1 .- ys[p]
-    A_mul_B!(scratch.t1, invRover2, scratch.t2)
-    # Compat.mul!(scratch.t1, invRover2, scratch.t2)
+    mul!(scratch.t1, invRover2, scratch.t2)
     return logncG - dot(scratch.t1,scratch.t2)
   end
   @inline function M!(newParticle::MVFloat64Particle{d}, rng::SMCRNG, p::Int64,
@@ -53,12 +51,9 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
       scratch.t2 .= sqrtv0 .* scratch.t1
       newParticle.x .= theta.x0 .+ scratch.t2
     else
-      # newParticle.x .= theta.A*particle.x + cholQ*randn(rng,d)
       randn!(rng, scratch.t1)
-      # mul!(scratch.t2, cholQ, scratch.t1)
-      # mul!(scratch.t1, theta.A, particle.x)
-      A_mul_B!(scratch.t2, cholQ, scratch.t1)
-      A_mul_B!(scratch.t1, theta.A, particle.x)
+      mul!(scratch.t2, cholQ, scratch.t1)
+      mul!(scratch.t1, theta.A, particle.x)
       newParticle.x .= scratch.t1 .+ scratch.t2
     end
   end
