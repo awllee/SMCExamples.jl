@@ -22,7 +22,7 @@ function makeLGAPFModel(theta::LGTheta, ys::Vector{Float64})
   invRover2::Float64 = 0.5/theta.R
   logncG::Float64 = -0.5 * log(2 * π * RC2Q)
 
-  @inline function lG(p::Int64, particle::Float64Particle, ::Void)
+  @inline function lG(p::Int64, particle::Float64Particle, ::Nothing)
     if p == n
       return p == 1 ? lG1 : 0.0
     end
@@ -32,7 +32,7 @@ function makeLGAPFModel(theta::LGTheta, ys::Vector{Float64})
     return v
   end
   @inline function M!(newParticle::Float64Particle, rng::SMCRNG, p::Int64,
-    particle::Float64Particle, ::Void)
+    particle::Float64Particle, ::Nothing)
     if p == 1
       newParticle.x = mu1 + sqrtv0RoverRC2v0*randn(rng)
     else
@@ -40,5 +40,5 @@ function makeLGAPFModel(theta::LGTheta, ys::Vector{Float64})
       newParticle.x = mu + sqrtQRoverRC2Q*randn(rng)
     end
   end
-  return SMCModel(M!, lG, n, Float64Particle, Void)
+  return SMCModel(M!, lG, n, Float64Particle, Nothing)
 end

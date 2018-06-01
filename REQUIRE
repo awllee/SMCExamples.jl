@@ -2,4 +2,4 @@ julia 0.6
 SequentialMonteCarlo
 StaticArrays
 KernelDensity
-Compat 0.38
+Compat

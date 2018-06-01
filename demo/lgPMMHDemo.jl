@@ -6,6 +6,7 @@ import SMCExamples.MarkovChains: simulateChain!, makeAMKernel, kdeMarkovChain,
 using StaticArrays
 using StatsBase
 using Plots
+import Compat.Nothing
 Plots.gr()
 !isinteractive() && (ENV["GKSwstype"] = "100")
 
@@ -21,11 +22,7 @@ const trueC = theta.C
 end
 
 t0 = SVector{3, Float64}(theta.A, theta.Q, theta.R)
-
-VERSION.minor == 6 &&
-  (const sigmaProp = SMatrix{3, 3, Float64}(eye(3)))
-VERSION.minor > 6 &&
-  (const sigmaProp = SMatrix{3, 3, Float64}(Matrix{Float64}(I, 3, 3)))
+const sigmaProp = SMatrix{3, 3, Float64}(Matrix{Float64}(I, 3, 3))
 
 @inline function lglogprior(theta::LGTheta)
   if theta.A < 0 || theta.A > 10 return -Inf end
@@ -35,7 +32,7 @@ VERSION.minor > 6 &&
 end
 
 function makelgsmcltd(ys::Vector{Float64}, N::Int64, nthreads::Int64)
-  smcio = SMCIO{Float64Particle, Void}(N, length(ys), nthreads, false, 0.5)
+  smcio = SMCIO{Float64Particle, Nothing}(N, length(ys), nthreads, false, 0.5)
   function ltd(in::SVector{3, Float64})
     theta::LGTheta = toLGTheta(in)
     lp::Float64 = lglogprior(theta)

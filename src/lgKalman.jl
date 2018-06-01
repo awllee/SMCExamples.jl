@@ -24,11 +24,11 @@ function kalman(theta::LGTheta, ys::Vector{Float64})
   R = theta.R
   x0 = theta.x0
   v0 = theta.v0
-  predictionMeans = Vector{Float64}(uninitialized, n)
-  predictionVariances = Vector{Float64}(uninitialized, n)
-  filteringMeans = Vector{Float64}(uninitialized, n)
-  filteringVariances = Vector{Float64}(uninitialized, n)
-  logZhats = Vector{Float64}(uninitialized, n)
+  predictionMeans = Vector{Float64}(undef, n)
+  predictionVariances = Vector{Float64}(undef, n)
+  filteringMeans = Vector{Float64}(undef, n)
+  filteringVariances = Vector{Float64}(undef, n)
+  logZhats = Vector{Float64}(undef, n)
   mutt1 = 0.0
   mutt = 0.0
   sigmatt1 = 0.0
@@ -52,8 +52,8 @@ function kalman(theta::LGTheta, ys::Vector{Float64})
     filteringMeans[p] = mutt
     filteringVariances[p] = sigmatt
   end
-  smoothingMeans = Vector{Float64}(uninitialized, n)
-  smoothingVariances = Vector{Float64}(uninitialized, n)
+  smoothingMeans = Vector{Float64}(undef, n)
+  smoothingVariances = Vector{Float64}(undef, n)
   smoothingMeans[n] = filteringMeans[n]
   smoothingVariances[n] = filteringVariances[n]
   for p = n:-1:2

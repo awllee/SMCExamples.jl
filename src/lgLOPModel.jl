@@ -28,7 +28,7 @@ function makeLGLOPModel(theta::LGTheta, ys::Vector{Float64})
   invRover2::Float64 = 0.5/theta.R
   logncG::Float64 = -0.5 * log(2 * π * RC2Q)
 
-  @inline function lG(p::Int64, particle::LGLOPParticle, ::Void)
+  @inline function lG(p::Int64, particle::LGLOPParticle, ::Nothing)
     if p == 1
       return lG1
     else
@@ -37,7 +37,7 @@ function makeLGLOPModel(theta::LGTheta, ys::Vector{Float64})
     end
   end
   @inline function M!(newParticle::LGLOPParticle, rng::SMCRNG, p::Int64,
-    particle::LGLOPParticle, ::Void)
+    particle::LGLOPParticle, ::Nothing)
     if p == 1
       newParticle.x = mu1 + sqrtv0RoverRC2v0*randn(rng)
     else
@@ -46,6 +46,6 @@ function makeLGLOPModel(theta::LGTheta, ys::Vector{Float64})
       newParticle.xprev = particle.x
     end
   end
-  model::SMCModel = SMCModel(M!, lG, n, LGLOPParticle, Void)
+  model::SMCModel = SMCModel(M!, lG, n, LGLOPParticle, Nothing)
   return model
 end

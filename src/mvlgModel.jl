@@ -5,6 +5,9 @@ module MVLinearGaussian
 using SequentialMonteCarlo
 using StaticArrays
 import SMCExamples.Particles.MVFloat64Particle
+using Compat.LinearAlgebra
+using Compat.Random
+using Compat
 
 struct MVLGTheta{d}
   A::SMatrix{d, d, Float64}
@@ -28,15 +31,19 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
   n = length(ys)
   cholQ = chol(theta.Q)'
   invRover2 = 0.5 * inv(theta.R)
-  sqrtv0 = sqrt.(theta.v0)
+  ## TODO: temporary workaround for SArrays in 0.7
+  sqrtv0::SVector{d, Float64} = sqrt.(Vector{Float64}(theta.v0))
+  # sqrtv0 = sqrt.(theta.v0)
   logncG = - 0.5 * d * log(2 * π) - 0.5 * logdet(theta.R)
   @inline function lG(p::Int64, particle::MVFloat64Particle{d},
     scratch::MVLGPScratch{d})
     # v = theta.C*particle.x - ys[p]
     # return logncG - dot(v,invRover2 * v)
     A_mul_B!(scratch.t1, theta.C, particle.x)
+    # Compat.mul!(scratch.t1, theta.C, particle.x)
     @inbounds scratch.t2 .= scratch.t1 .- ys[p]
     A_mul_B!(scratch.t1, invRover2, scratch.t2)
+    # Compat.mul!(scratch.t1, invRover2, scratch.t2)
     return logncG - dot(scratch.t1,scratch.t2)
   end
   @inline function M!(newParticle::MVFloat64Particle{d}, rng::SMCRNG, p::Int64,
@@ -48,6 +55,8 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
     else
       # newParticle.x .= theta.A*particle.x + cholQ*randn(rng,d)
       randn!(rng, scratch.t1)
+      # mul!(scratch.t2, cholQ, scratch.t1)
+      # mul!(scratch.t1, theta.A, particle.x)
       A_mul_B!(scratch.t2, cholQ, scratch.t1)
       A_mul_B!(scratch.t1, theta.A, particle.x)
       newParticle.x .= scratch.t1 .+ scratch.t2
@@ -57,8 +66,8 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
 end
 
 function simulateMVLGModel(theta::MVLGTheta{d}, n::Int64) where d
-  model = makeMVLGModel(theta, Vector{SVector{d, Float64}}(0))
-  ys = Vector{SVector{d, Float64}}(n)
+  model = makeMVLGModel(theta, Vector{SVector{d, Float64}}(undef, 0))
+  ys = Vector{SVector{d, Float64}}(undef, n)
   xParticle = MVFloat64Particle{d}()
   xScratch = MVLGPScratch{d}()
   cholR = chol(theta.R)'
@@ -72,7 +81,7 @@ end
 
 function defaultMVLGModel(d::Int64, n::Int64)
   function toeplitz(d::Int64, a::Float64, C::Float64)
-    M = Matrix{Float64}(d, d)
+    M = Matrix{Float64}(undef, d, d)
     for i = 1:d
       for j = 1:d
         M[i,j] = C * a^abs(i-j)
@@ -81,14 +90,12 @@ function defaultMVLGModel(d::Int64, n::Int64)
     return SMatrix{d, d, Float64}(M)
   end
 
-  VERSION.minor == 6 && (tA = SMatrix{d, d, Float64}(0.9 * eye(d)))
-  VERSION.minor > 6 &&
-    (tA = SMatrix{d, d, Float64}(0.9 * Matrix{Float64}(I, d, d)))
+  tA = SMatrix{d, d, Float64}(0.9 * Matrix{Float64}(I, d, d))
   tC = toeplitz(d, 0.5, 1.2)
   tQ = toeplitz(d, 0.2, 0.6)
   tR = toeplitz(d, 0.3, 1.5)
-  tx0 = SVector{d,Float64}(linspace(1, d, d))
-  tv0 = SVector{d,Float64}(linspace(2, d+1, d))
+  tx0 = SVector{d,Float64}(Compat.range(1, step=1, length=d))
+  tv0 = SVector{d,Float64}(Compat.range(2, step=1, length=d))
   theta = MVLGTheta(tA, tQ, tC, tR, tx0, tv0)
   ys = simulateMVLGModel(theta, n)
 

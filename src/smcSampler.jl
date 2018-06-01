@@ -18,6 +18,10 @@ module SMCSampler
 using SequentialMonteCarlo
 using StaticArrays
 
+import Compat.Nothing
+using Compat.LinearAlgebra
+using Compat.Random
+
 ## one-dimensional state
 mutable struct SMCSP
   x::Float64
@@ -32,7 +36,7 @@ function makeRWSMCSampler(mu, lpibar0, lpibar1, betas::Vector{Float64},
   n = length(betas)
   @assert n == length(taus) == length(iterations)
 
-  @inline function lG(p::Int64, particle::SMCSP, ::Void)
+  @inline function lG(p::Int64, particle::SMCSP, ::Nothing)
     if p == n
       return 0.0
     end
@@ -40,7 +44,7 @@ function makeRWSMCSampler(mu, lpibar0, lpibar1, betas::Vector{Float64},
       (particle.lpibar1 - particle.lpibar0);
   end
   @inline function M!(newParticle::SMCSP, rng::SMCRNG, p::Int64,
-    particle::SMCSP, ::Void)
+    particle::SMCSP, ::Nothing)
     if p == 1
       newParticle.x = mu(rng)
       newParticle.lpibar0 = lpibar0(newParticle.x)
@@ -67,7 +71,7 @@ function makeRWSMCSampler(mu, lpibar0, lpibar1, betas::Vector{Float64},
       newParticle.lpibar1 = lv1
     end
   end
-  return SMCModel(M!, lG, n, SMCSP, Void)
+  return SMCModel(M!, lG, n, SMCSP, Nothing)
 end
 
 function defaultSMCSampler1D()

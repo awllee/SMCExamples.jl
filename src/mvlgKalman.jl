@@ -25,11 +25,11 @@ function kalmanMV(theta::MVLGTheta, ys::Vector{SVector{d,Float64}}) where d
   R = theta.R
   x0 = theta.x0
   v0 = theta.v0
-  predictionMeans = Vector{MVector{d,Float64}}(n)
-  predictionVariances = Vector{MMatrix{d,d,Float64}}(n)
-  filteringMeans = Vector{MVector{d,Float64}}(n)
-  filteringVariances = Vector{MMatrix{d,d,Float64}}(n)
-  logZhats = Vector{Float64}(n)
+  predictionMeans = Vector{MVector{d,Float64}}(undef, n)
+  predictionVariances = Vector{MMatrix{d,d,Float64}}(undef, n)
+  filteringMeans = Vector{MVector{d,Float64}}(undef, n)
+  filteringVariances = Vector{MMatrix{d,d,Float64}}(undef, n)
+  logZhats = Vector{Float64}(undef, n)
   mutt1 = MVector{d,Float64}()
   mutt = MVector{d,Float64}()
   sigmatt1 = MMatrix{d,d,Float64}()
@@ -53,8 +53,8 @@ function kalmanMV(theta::MVLGTheta, ys::Vector{SVector{d,Float64}}) where d
     filteringMeans[p] = mutt
     filteringVariances[p] = sigmatt
   end
-  smoothingMeans = Vector{MVector{d,Float64}}(n)
-  smoothingVariances = Vector{MMatrix{d,d,Float64}}(n)
+  smoothingMeans = Vector{MVector{d,Float64}}(undef, n)
+  smoothingVariances = Vector{MMatrix{d,d,Float64}}(undef, n)
   smoothingMeans[n] = filteringMeans[n]
   smoothingVariances[n] = filteringVariances[n]
   for p = n:-1:2

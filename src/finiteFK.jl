@@ -6,7 +6,7 @@ module FiniteFeynmanKac
 using SequentialMonteCarlo
 using StaticArrays
 import SMCExamples.Particles.Int64Particle
-import Compat.uninitialized
+import Compat: undef, Nothing, findall
 
 struct FiniteFK{d}
   mu::SVector{d, Float64}
@@ -26,21 +26,24 @@ let
   global function makeSMCModel(fk::FiniteFK{d}) where d
     n::Int64 = length(fk.Gs)
     mu::SVector{d, Float64} = fk.mu
-    Ms = Matrix{SVector{d, Float64}}(n - 1, d)
+    Ms = Matrix{SVector{d, Float64}}(undef, n-1, d)
     for p = 1:n-1
       for i = 1:d
         Ms[p,i] = fk.Ms[p][i, :]
       end
     end
-    lGVectors::Vector{SVector{d, Float64}} = Vector{SVector{d, Float64}}(n)
+    lGVectors::Vector{SVector{d, Float64}} =
+      Vector{SVector{d, Float64}}(undef, n)
     for p = 1:n
-      lGVectors[p] = log.(fk.Gs[p])
+      # lGVectors[p] = log.(fk.Gs[p])
+      ## TODO: temporary workaround for SArrays in 0.7
+      lGVectors[p] = log.(Vector{Float64}(fk.Gs[p]))
     end
-    @inline function lG(p::Int64, particle::Int64Particle, ::Void)
+    @inline function lG(p::Int64, particle::Int64Particle, ::Nothing)
       @inbounds return lGVectors[p][particle.x]
     end
     @inline function M!(newParticle::Int64Particle, rng::SMCRNG, p::Int64,
-      particle::Int64Particle, ::Void)
+      particle::Int64Particle, ::Nothing)
       if p == 1
         newParticle.x = sample(mu, rand(rng))
       else
@@ -48,7 +51,7 @@ let
         @inbounds newParticle.x = sample(probs, rand(rng))
       end
     end
-    return SMCModel(M!, lG, n, Int64Particle, Void)
+    return SMCModel(M!, lG, n, Int64Particle, Nothing)
   end
 end
 
@@ -58,8 +61,8 @@ function randomFiniteFK(d::Int64, n::Int64)
   mu = rand(rng, d)
   mu ./= sum(mu)
 
-  Ms = Vector{SMatrix{d, d, Float64}}(uninitialized, n - 1)
-  Gs = Vector{SVector{d, Float64}}(uninitialized, n)
+  Ms = Vector{SMatrix{d, d, Float64}}(undef, n - 1)
+  Gs = Vector{SVector{d, Float64}}(undef, n)
   for p = 1:n-1
     tmp = rand(rng, d, d)
     for i = 1:d
@@ -84,10 +87,10 @@ end
 
 function calculateEtasZs(fk::FiniteFK{d}) where d
   n::Int64 = length(fk.Gs)
-  etas = Vector{SVector{d, Float64}}(uninitialized, n)
-  etahats = Vector{SVector{d, Float64}}(uninitialized, n)
-  logZhats = Vector{Float64}(uninitialized, n)
-  etaGs = Vector{Float64}(uninitialized, n)
+  etas = Vector{SVector{d, Float64}}(undef, n)
+  etahats = Vector{SVector{d, Float64}}(undef, n)
+  logZhats = Vector{Float64}(undef, n)
+  etaGs = Vector{Float64}(undef, n)
   etas[1] = fk.mu
   tmp = MVector{d, Float64}()
   tmp .= etas[1] .* fk.Gs[1]
@@ -103,14 +106,14 @@ function calculateEtasZs(fk::FiniteFK{d}) where d
     etahats[p] = tmp ./ etaGs[p]
   end
 
-  pis = Vector{SVector{d, Float64}}(n)
-  pihats = Vector{SVector{d, Float64}}(n)
+  pis = Vector{SVector{d, Float64}}(undef, n)
+  pihats = Vector{SVector{d, Float64}}(undef, n)
   pis[n] = etas[n]
   pihats[n] = etahats[n]
   for p = n-1:-1:1
     Mbar = MMatrix{d, d, Float64}()
     for i = 1:d
-      Mbar[i,:] = etahats[p] .* fk.Ms[p][:,i] / etas[p+1][i]
+      Mbar[i,:] = etahats[p] .* fk.Ms[p][:,i] ./ etas[p+1][i]
     end
     pis[p] = pis[p+1]' * Mbar
     pihats[p] = pihats[p+1]' * Mbar
@@ -121,17 +124,21 @@ end
 
 function eta(ffkout::FiniteFKOut{d}, fv::SVector{d, Float64}, hat::Bool,
   p::Int64 = length(fk.Gs)) where d
+  ## TODO: temporary workaround for SArrays in 0.7
+  fv2 = Vector{Float64}(fv)
   if hat
-    return sum(ffkout.etahats[p] .* fv)
+    # return sum(ffkout.etahats[p] .* fv)
+    return sum(ffkout.etahats[p] .* fv2)
   else
-    return sum(ffkout.etas[p] .* fv)
+    # return sum(ffkout.etas[p] .* fv)
+    return sum(ffkout.etas[p] .* fv2)
   end
 end
 
 function allEtas(ffkout::FiniteFKOut{d}, fv::SVector{d, Float64},
   hat::Bool) where d
   n::Int64 = length(ffkout.etas)
-  result::Vector{Float64} = Vector{Float64}(n)
+  result::Vector{Float64} = Vector{Float64}(undef, n)
   for p = 1:n
     @inbounds result[p] = eta(ffkout, fv, hat, p)
   end
@@ -150,7 +157,8 @@ end
 function allGammas(ffkout::FiniteFKOut{d}, fv::SVector{d, Float64},
   hat::Bool) where d
   n::Int64 = length(ffkout.etas)
-  result::Vector{Tuple{Bool,Float64}} = Vector{Tuple{Bool,Float64}}(n)
+  result::Vector{Tuple{Bool, Float64}} =
+    Vector{Tuple{Bool, Float64}}(undef, n)
   for p = 1:n
     @inbounds result[p] = gamma(ffkout, fv, hat, p)
   end
@@ -188,7 +196,7 @@ end
 
 function normalizeFiniteFK(fk::FiniteFK{d}, fkout::FiniteFKOut) where d
   n = length(fk.Gs)
-  barGs = Vector{SVector{d, Float64}}(n)
+  barGs = Vector{SVector{d, Float64}}(undef, n)
   for p = 1:n
     barGs[p] = fk.Gs[p] / fkout.etaGs[p]
   end
@@ -198,26 +206,30 @@ end
 function _nuQpqf(fk::FiniteFK{d}, nu::SVector{d, Float64}, p::Int64, q::Int64,
   f::SVector{d, Float64}) where d
   if p == q
-    return sum(nu .*f)
+    ## TODO: temporary workaround for SArrays in 0.7
+    return sum(nu .* Vector{Float64}(f))
+    # return sum(nu .* f)
   end
   v = MVector{d,Float64}(nu)
   for i = p+1:q
     v .*= fk.Gs[i-1]
     v .= (v' * fk.Ms[i-1])'
   end
-  return sum(v .* f)
+  ## TODO: temporary workaround for SArrays in 0.7
+  return sum(v .* Vector{Float64}(f))
+  # return sum(v .* f)
 end
 
 function _Qpqf(fk::FiniteFK{d}, x::Int64, p::Int64, q::Int64,
   f::SVector{d, Float64}) where d
   v = zeros(MVector{d,Float64})
   v[x] = 1.0
-  return _nuQpqf(fk, SVector{d,Float64}(v), p, q, f)
+  return _nuQpqf(fk, SVector{d, Float64}(v), p, q, f)
 end
 
 function _Qpqf(fk::FiniteFK{d}, p::Int64, q::Int64,
   f::SVector{d, Float64}) where d
-  result = MVector{d,Float64}()
+  result = MVector{d, Float64}()
   for x = 1:d
     result[x] = _Qpqf(fk, x, p, q, f)
   end
@@ -225,7 +237,7 @@ function _Qpqf(fk::FiniteFK{d}, p::Int64, q::Int64,
 end
 
 function _Qpnfs(fk::FiniteFK{d}, f::SVector{d, Float64}, n::Int64) where d
-  result = Vector{MVector{d,Float64}}(n)
+  result = Vector{MVector{d, Float64}}(undef, n)
   for p = 1:n
     result[p] = _Qpqf(fk, p, n, f)
   end
@@ -252,17 +264,23 @@ function vpns(fk::FiniteFK{d}, fkout::FiniteFKOut, f::SVector{d, Float64},
   hat::Bool, centred::Bool, resample::Vector{Bool},
   n::Int64 = length(fk.Gs)) where d
   if centred
-    return vpns(fk, fkout, f - eta(fkout, f, hat, n), hat, false, resample, n)
+    ## TODO: temporary workaround for SArrays in 0.7
+    tmp = SVector{d, Float64}(f - eta(fkout, f, hat, n))
+    return vpns(fk, fkout, tmp, hat, false, resample, n)
+    # return vpns(fk, fkout, f - eta(fkout, f, hat, n), hat, false, resample, n)
   end
   if hat
-    return vpns(fk, fkout, f .* fk.Gs[n] / fkout.etaGs[n], false, false,
-      resample, n)
+    ## TODO: temporary workaround for SArrays in 0.7
+    tmp = SVector{d, Float64}(f .* fk.Gs[n] ./ fkout.etaGs[n])
+    return vpns(fk, fkout, tmp, false, false, resample, n)
+    # return vpns(fk, fkout, f .* fk.Gs[n] / fkout.etaGs[n], false, false,
+    #   resample, n)
   end
-  ps::Vector{Int64} = [1 ; find(resample[1:n-1]) .+ 1]
+  ps::Vector{Int64} = [1 ; findall(resample[1:n-1]) .+ 1]
 
   nffk = normalizeFiniteFK(fk, fkout)
   Qpnfs_values = _Qpnfs(nffk, f, n)
-  result = Vector{Float64}(length(ps))
+  result = Vector{Float64}(undef, length(ps))
   etanfSq = eta(fkout, f, false, n)^2
   for i = 1:length(ps)
     p = ps[i]
@@ -299,7 +317,7 @@ end
 function allavarhat1s(fk::FiniteFK{d}, fkout::FiniteFKOut,
   resample::Vector{Bool}) where d
   maxn = length(fk.Gs)
-  result = Vector{Float64}(maxn)
+  result = Vector{Float64}(undef, maxn)
   f1 = ones(SVector{d, Float64})
   for n = 1:maxn
     result[n] = avar(fk, fkout, f1, true, false, resample, n)
@@ -316,7 +334,7 @@ function Path2Int64(path::Vector{Int64Particle}, d::Int64)
 end
 
 function Int642Path(v::Int64, d::Int64, n::Int64)
-  path::Vector{Int64Particle} = Vector{Int64Particle}(n)
+  path::Vector{Int64Particle} = Vector{Int64Particle}(undef, n)
   y = v - 1
   for p = 1:n
     path[p] = Int64Particle()
