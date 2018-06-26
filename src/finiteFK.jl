@@ -35,9 +35,7 @@ let
     lGVectors::Vector{SVector{d, Float64}} =
       Vector{SVector{d, Float64}}(undef, n)
     for p = 1:n
-      # lGVectors[p] = log.(fk.Gs[p])
-      ## TODO: temporary workaround for SArrays in 0.7
-      lGVectors[p] = log.(Vector{Float64}(fk.Gs[p]))
+      lGVectors[p] = log.(fk.Gs[p])
     end
     @inline function lG(p::Int64, particle::Int64Particle, ::Nothing)
       @inbounds return lGVectors[p][particle.x]
@@ -124,14 +122,10 @@ end
 
 function eta(ffkout::FiniteFKOut{d}, fv::SVector{d, Float64}, hat::Bool,
   p::Int64 = length(fk.Gs)) where d
-  ## TODO: temporary workaround for SArrays in 0.7
-  fv2 = Vector{Float64}(fv)
   if hat
-    # return sum(ffkout.etahats[p] .* fv)
-    return sum(ffkout.etahats[p] .* fv2)
+    return sum(ffkout.etahats[p] .* fv)
   else
-    # return sum(ffkout.etas[p] .* fv)
-    return sum(ffkout.etas[p] .* fv2)
+    return sum(ffkout.etas[p] .* fv)
   end
 end
 
@@ -206,18 +200,14 @@ end
 function _nuQpqf(fk::FiniteFK{d}, nu::SVector{d, Float64}, p::Int64, q::Int64,
   f::SVector{d, Float64}) where d
   if p == q
-    ## TODO: temporary workaround for SArrays in 0.7
-    return sum(nu .* Vector{Float64}(f))
-    # return sum(nu .* f)
+    return sum(nu .* f)
   end
   v = MVector{d,Float64}(nu)
   for i = p+1:q
     v .*= fk.Gs[i-1]
     v .= (v' * fk.Ms[i-1])'
   end
-  ## TODO: temporary workaround for SArrays in 0.7
-  return sum(v .* Vector{Float64}(f))
-  # return sum(v .* f)
+  return sum(v .* f)
 end
 
 function _Qpqf(fk::FiniteFK{d}, x::Int64, p::Int64, q::Int64,
@@ -264,17 +254,11 @@ function vpns(fk::FiniteFK{d}, fkout::FiniteFKOut, f::SVector{d, Float64},
   hat::Bool, centred::Bool, resample::Vector{Bool},
   n::Int64 = length(fk.Gs)) where d
   if centred
-    ## TODO: temporary workaround for SArrays in 0.7
-    tmp = SVector{d, Float64}(f - eta(fkout, f, hat, n))
-    return vpns(fk, fkout, tmp, hat, false, resample, n)
-    # return vpns(fk, fkout, f - eta(fkout, f, hat, n), hat, false, resample, n)
+    return vpns(fk, fkout, f - eta(fkout, f, hat, n), hat, false, resample, n)
   end
   if hat
-    ## TODO: temporary workaround for SArrays in 0.7
-    tmp = SVector{d, Float64}(f .* fk.Gs[n] ./ fkout.etaGs[n])
-    return vpns(fk, fkout, tmp, false, false, resample, n)
-    # return vpns(fk, fkout, f .* fk.Gs[n] / fkout.etaGs[n], false, false,
-    #   resample, n)
+    return vpns(fk, fkout, f .* fk.Gs[n] / fkout.etaGs[n], false, false,
+      resample, n)
   end
   ps::Vector{Int64} = [1 ; findall(resample[1:n-1]) .+ 1]
 

@@ -33,9 +33,7 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
   n = length(ys)
   cholQ = chol(theta.Q)'
   invRover2 = 0.5 * inv(theta.R)
-  ## TODO: temporary workaround for SArrays in 0.7
-  sqrtv0::SVector{d, Float64} = sqrt.(Vector{Float64}(theta.v0))
-  # sqrtv0 = sqrt.(theta.v0)
+  sqrtv0 = sqrt.(theta.v0)
   logncG = - 0.5 * d * log(2 * π) - 0.5 * logdet(theta.R)
   @inline function lG(p::Int64, particle::MVFloat64Particle{d},
     scratch::MVLGPScratch{d})
