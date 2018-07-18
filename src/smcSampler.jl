@@ -22,6 +22,16 @@ import Compat.Nothing
 using Compat.LinearAlgebra
 using Compat.Random
 
+if VERSION.minor == 7
+  function mychol(A)
+    return cholesky(A).L
+  end
+else
+  function mychol(A)
+    return chol(Symmetric(A))'
+  end
+end
+
 ## one-dimensional state
 mutable struct SMCSP
   x::Float64
@@ -193,7 +203,7 @@ function defaultSMCSampler()
 
   μ0 = SVector{2, Float64}(0.0, 0.0)
   Σ0 = SMatrix{2, 2, Float64}(100.0, 0.0, 0.0, 100.0)
-  A0 = chol(Σ0)'
+  A0 = SMatrix{2, 2, Float64}(mychol(Σ0))
 
   lpibar0 = makelogMVN(μ0, Σ0)
   @inline function mu(rng::SMCRNG, scratch::SMCSScratch{2})

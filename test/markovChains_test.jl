@@ -1,10 +1,14 @@
 using SMCExamples.MarkovChains
 using StaticArrays
 using Compat.Test
+using Compat.LinearAlgebra
+using Compat.Random
+import Compat.undef
+if VERSION.minor == 7 import Statistics.mean end
 
 ## demo with a MV normal target
 
-function makelogMVN{d}(μ::SVector{d, Float64}, Σ::SMatrix{d, d, Float64})
+function makelogMVN(μ::SVector{d, Float64}, Σ::SMatrix{d, d, Float64}) where d
   invΣ = inv(Σ)
   lognc = - 0.5 * d * log(2 * π) - 0.5 * logdet(Σ)
   function lpi(x::SVector{d, Float64})
@@ -17,7 +21,7 @@ end
 zero2 = [0.0, 0.0]
 μ1 = [-1.0, 0.0]
 Σ1 = [1.0 0.25 ; 0.25 3.0]
-propSigma = .01*eye(2)
+propSigma = .01*Matrix{Float64}(I, 2, 2)
 
 Szero2 = SVector{2, Float64}(zero2)
 SpropSigma = SMatrix{2, 2, Float64}(propSigma)
@@ -26,7 +30,7 @@ logtarget = makelogMVN(SVector{2, Float64}(μ1),
   SMatrix{2, 2, Float64}(Σ1))
 
 niterations = 2^20
-chain = Vector{SVector{2, Float64}}(niterations)
+chain = Vector{SVector{2, Float64}}(undef, niterations)
 
 srand(12345)
 
@@ -34,11 +38,11 @@ P_AM = MarkovChains.makeAMKernel(logtarget, SpropSigma)
 MarkovChains.simulateChain!(chain, P_AM, Szero2)
 
 @test mean(chain) ≈ P_AM(:meanEstimate)
-@test cov(chain) ≈ P_AM(:covEstimate)
+@test MarkovChains.cov(chain) ≈ P_AM(:covEstimate)
 @test mean(chain) ≈ μ1 atol = 0.01
-@test cov(chain) ≈ Σ1 atol = 0.05
+@test MarkovChains.cov(chain) ≈ Σ1 atol = 0.05
 
-vs = Vector{Vector{Float64}}(2)
+vs = Vector{Vector{Float64}}(undef, 2)
 for i = 1:2
   vs[i] = (x->x[i]).(chain)
 end

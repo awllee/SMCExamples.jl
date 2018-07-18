@@ -14,9 +14,16 @@ mutable struct Float64Particle
   Float64Particle() = new()
 end
 
-struct MVFloat64Particle{d}
-  x::MVector{d, Float64}
-  MVFloat64Particle{d}() where d = new(MVector{d, Float64}())
+if VERSION.minor == 7
+  struct MVFloat64Particle{d}
+    x::MVector{d, Float64}
+    MVFloat64Particle{d}() where d = new(MVector{d, Float64}(undef))
+  end
+else
+  struct MVFloat64Particle{d}
+    x::MVector{d, Float64}
+    MVFloat64Particle{d}() where d = new(MVector{d, Float64}())
+  end
 end
 
 end

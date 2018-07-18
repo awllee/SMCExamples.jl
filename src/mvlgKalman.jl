@@ -1,3 +1,5 @@
+import Compat.LinearAlgebra.diagm
+
 ## Kalman filter for multivariate linear Gaussian models
 
 struct KalmanMVOut{d}
@@ -38,7 +40,7 @@ function kalmanMV(theta::MVLGTheta, ys::Vector{SVector{d,Float64}}) where d
   for p = 1:n
     if p == 1
       mutt1 = x0
-      sigmatt1 = diagm(v0)
+      sigmatt1 = diagm(0 => v0)
     else
       mutt1 = A * mutt
       sigmatt1 = A * sigmatt * A' + Q

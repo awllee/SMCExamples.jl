@@ -4,6 +4,20 @@ module MarkovChains
 
 using StaticArrays
 using SMCExamples.Visualize
+using Compat.LinearAlgebra
+using Compat.Random
+
+import Compat.undef
+if VERSION.minor == 7
+  import Statistics.mean
+  function mychol(A)
+    return cholesky(A).L
+  end
+else
+  function mychol(A)
+    return chol(Symmetric(A))'
+  end
+end
 
 function simulateChain!(chain::Vector{T}, P::F, x0::T) where {F<:Function, T}
   n::Int64 = length(chain)
@@ -15,7 +29,7 @@ function simulateChain!(chain::Vector{T}, P::F, x0::T) where {F<:Function, T}
   return chain
 end
 
-function Base.cov(xs::Vector{SVector{d, Float64}}) where d
+function cov(xs::Vector{SVector{d, Float64}}) where d
   xbar = mean(xs)
   Q::SMatrix{d, d, Float64} = zeros(SMatrix{d, d, Float64})
   for i = 1:length(xs)
@@ -60,7 +74,7 @@ end
 function makeAMKernel(logTargetDensity::F, Σ::SMatrix{d, d, Float64}) where
   {F<:Function, d}
   S::MMatrix{d, d, Float64} = Σ
-  A::MMatrix{d, d, Float64} = chol(Symmetric(S))'
+  A::MMatrix{d, d, Float64} = mychol(S)
 
   scratchv::MVector{d, Float64} = MVector{d, Float64}()
   prevx::MVector{d, Float64} = MVector{d, Float64}()
@@ -72,7 +86,7 @@ function makeAMKernel(logTargetDensity::F, Σ::SMatrix{d, d, Float64}) where
   meanEstimate::MVector{d, Float64} = zeros(MVector{d, Float64})
   function retuneSigma()
     S .= 5.6644/d * covEstimate * calls.x /(calls.x-1)
-    A .= chol(Symmetric(S))'
+    A .= mychol(S)'
   end
   function P(x::SVector{d, Float64})
     calls.x += 1

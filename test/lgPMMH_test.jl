@@ -63,4 +63,5 @@ chainKalman = Vector{SVector{3, Float64}}(1024*1024)
 simulateChain!(chainKalman, PKalman, t0)
 
 @test mean(chainSMC) ≈ mean(chainKalman) atol=0.2
-@test cov(chainSMC) ≈ cov(chainKalman) atol=0.2
+@test SMCExamples.MarkovChains.cov(chainSMC) ≈
+  SMCExamples.MarkovChains.cov(chainKalman) atol=0.2

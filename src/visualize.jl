@@ -1,6 +1,7 @@
 module Visualize
 
 using KernelDensity
+if VERSION.minor == 7 import Statistics.std end
 
 ## uses Silverman’s rule of thumb
 function _defaultBandwidth(vs::Vector{Float64})

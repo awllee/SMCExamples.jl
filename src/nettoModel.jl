@@ -8,7 +8,7 @@ module Netto
 using SequentialMonteCarlo
 import SMCExamples.Particles.Float64Particle
 
-import Compat.Nothing
+import Compat: Nothing, undef
 
 struct NettoTheta
   σ²::Float64
@@ -40,8 +40,8 @@ function makeNettoModel(theta::NettoTheta, ys::Vector{Float64})
 end
 
 function simulateNettoModel(theta::NettoTheta, n::Int64)
-  model = makeNettoModel(theta, Vector{Float64}(0))
-  ys = Vector{Float64}(n)
+  model = makeNettoModel(theta, Vector{Float64}(undef, 0))
+  ys = Vector{Float64}(undef, n)
   xParticle = Float64Particle()
   rng = getSMCRNG()
   for p in 1:n

@@ -11,6 +11,16 @@ using Compat
 
 if VERSION.minor == 6 mul! = A_mul_B! end
 
+if VERSION.minor == 7
+  function mychol(A)
+    return cholesky(A).L
+  end
+else
+  function mychol(A)
+    return chol(Symmetric(A))'
+  end
+end
+
 struct MVLGTheta{d}
   A::SMatrix{d, d, Float64}
   Q::SMatrix{d, d, Float64}
@@ -31,7 +41,8 @@ MVLGPScratch{d}() where d = MVLGPScratch{d}(MVector{d, Float64}(),
 function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
   d
   n = length(ys)
-  cholQ = chol(theta.Q)'
+  # cholQ = chol(theta.Q)'
+  cholQ = SMatrix{d, d, Float64}(mychol(theta.Q))
   invRover2 = 0.5 * inv(theta.R)
   sqrtv0 = sqrt.(theta.v0)
   logncG = - 0.5 * d * log(2 * π) - 0.5 * logdet(theta.R)
@@ -63,7 +74,8 @@ function simulateMVLGModel(theta::MVLGTheta{d}, n::Int64) where d
   ys = Vector{SVector{d, Float64}}(undef, n)
   xParticle = MVFloat64Particle{d}()
   xScratch = MVLGPScratch{d}()
-  cholR = chol(theta.R)'
+  # cholR = chol(theta.R)'
+  cholR = mychol(theta.R)
   rng = getSMCRNG()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, xScratch)

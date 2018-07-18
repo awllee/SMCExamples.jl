@@ -7,6 +7,8 @@ module Lorenz96
 using SequentialMonteCarlo
 using StaticArrays
 import SMCExamples.Particles.MVFloat64Particle
+using Compat.Random
+import Compat.undef
 
 struct LorenzTheta
   σ::Float64
@@ -76,8 +78,8 @@ function makeLorenzModel(theta::LorenzTheta,
 end
 
 function simulateLorenzModel(theta::LorenzTheta, d::Int64, n::Int64)
-  model = makeLorenzModel(theta, Vector{SVector{d, Float64}}(0))
-  ys = Vector{SVector{d, Float64}}(n)
+  model = makeLorenzModel(theta, Vector{SVector{d, Float64}}(undef, 0))
+  ys = Vector{SVector{d, Float64}}(undef, n)
   xParticle = MVFloat64Particle{d}()
   xScratch = LorenzScratch{d}()
   rng = getSMCRNG()
