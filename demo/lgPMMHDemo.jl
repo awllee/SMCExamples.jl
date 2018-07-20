@@ -1,8 +1,7 @@
 using SequentialMonteCarlo
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
-import SMCExamples.MarkovChains: simulateChain!, makeAMKernel, kdeMarkovChain,
-  estimateAvar
+import MonteCarloMarkovKernels: simulateChain!, makeAMKernel, kde, estimateBM
 using StaticArrays
 using StatsBase
 using Plots
@@ -82,28 +81,28 @@ for i = 1:3
   vsSMC[i] = (x->x[i]).(chainSMC)
 end
 
-plot(kdeMarkovChain(vsSMC[1], sar))
-plot!(kdeMarkovChain(vsKalman[1], kar))
+plot(kde(vsSMC[1], sar))
+plot!(kde(vsKalman[1], kar))
 savefigures && savefig("pmmh_kde1.png")
 
-plot(kdeMarkovChain(vsSMC[2], sar))
-plot!(kdeMarkovChain(vsKalman[2], kar))
+plot(kde(vsSMC[2], sar))
+plot!(kde(vsKalman[2], kar))
 savefigures && savefig("pmmh_kde2.png")
 
-plot(kdeMarkovChain(vsSMC[3], sar))
-plot!(kdeMarkovChain(vsKalman[3], kar))
+plot(kde(vsSMC[3], sar))
+plot!(kde(vsKalman[3], kar))
 savefigures && savefig("pmmh_kde3.png")
 
-contour(kdeMarkovChain(vsSMC[1], vsSMC[2], sar))
-contour!(kdeMarkovChain(vsKalman[1], vsKalman[2], kar))
+contour(kde(vsSMC[1], vsSMC[2], sar))
+contour!(kde(vsKalman[1], vsKalman[2], kar))
 savefigures && savefig("pmmh_kde12.png")
 
-contour(kdeMarkovChain(vsSMC[1], vsSMC[3], sar))
-contour!(kdeMarkovChain(vsKalman[1], vsKalman[3], kar))
+contour(kde(vsSMC[1], vsSMC[3], sar))
+contour!(kde(vsKalman[1], vsKalman[3], kar))
 savefigures && savefig("pmmh_kde13.png")
 
-contour(kdeMarkovChain(vsSMC[2], vsSMC[3], sar))
-contour!(kdeMarkovChain(vsKalman[2], vsKalman[3], kar))
+contour(kde(vsSMC[2], vsSMC[3], sar))
+contour!(kde(vsKalman[2], vsKalman[3], kar))
 savefigures && savefig("pmmh_kde23.png")
 
 plot(autocor(vsSMC[1]))
@@ -116,9 +115,5 @@ plot(autocor(vsSMC[3]))
 plot!(autocor(vsKalman[3]))
 savefigures && savefig("pmmh_acf3.png")
 
-estimateAvar(vsSMC[1])
-estimateAvar(vsKalman[1])
-estimateAvar(vsSMC[2])
-estimateAvar(vsKalman[2])
-estimateAvar(vsSMC[3])
-estimateAvar(vsKalman[3])
+estimateBM.(vsSMC)
+estimateBM.(vsKalman)

@@ -24,10 +24,6 @@ end
   include("netto_test.jl")
 end
 
-@testset "Markov chain tests" begin
-  include("markovChains_test.jl")
-end
-
 @testset "PMMH tests" begin
   include("lgPMMH_test.jl")
 end

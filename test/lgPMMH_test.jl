@@ -1,10 +1,13 @@
 using SequentialMonteCarlo
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
-import SMCExamples.MarkovChains: simulateChain!, makeAMKernel
+using MonteCarloMarkovKernels
 using StaticArrays
 using Compat.Test
 import Compat.Nothing
+using Compat.Random
+using Compat.LinearAlgebra
+import Compat.Statistics.mean
 
 setSMCRNGs(0)
 lgModel, theta, ys, ko = defaultLGModel(100)
@@ -56,12 +59,12 @@ PKalman = makeAMKernel(logtargetKalman, sigmaProp)
 
 srand(12345)
 
-chainSMC = Vector{SVector{3, Float64}}(2048)
+chainSMC = Vector{SVector{3, Float64}}(1024*16)
 simulateChain!(chainSMC, PSMC, t0)
 
 chainKalman = Vector{SVector{3, Float64}}(1024*1024)
 simulateChain!(chainKalman, PKalman, t0)
 
 @test mean(chainSMC) ≈ mean(chainKalman) atol=0.2
-@test SMCExamples.MarkovChains.cov(chainSMC) ≈
-  SMCExamples.MarkovChains.cov(chainKalman) atol=0.2
+@test MonteCarloMarkovKernels.cov(chainSMC) ≈
+  MonteCarloMarkovKernels.cov(chainKalman) atol=0.2
