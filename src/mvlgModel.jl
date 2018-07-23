@@ -35,8 +35,8 @@ struct MVLGPScratch{d}
   t1::MVector{d, Float64}
   t2::MVector{d, Float64}
 end
-MVLGPScratch{d}() where d = MVLGPScratch{d}(MVector{d, Float64}(),
-  MVector{d, Float64}())
+MVLGPScratch{d}() where d = MVLGPScratch{d}(MVector{d, Float64}(undef),
+  MVector{d, Float64}(undef))
 
 function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
   d

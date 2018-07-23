@@ -90,7 +90,7 @@ function calculateEtasZs(fk::FiniteFK{d}) where d
   logZhats = Vector{Float64}(undef, n)
   etaGs = Vector{Float64}(undef, n)
   etas[1] = fk.mu
-  tmp = MVector{d, Float64}()
+  tmp = MVector{d, Float64}(undef)
   tmp .= etas[1] .* fk.Gs[1]
   etaGs[1] = sum(tmp)
   logZhats[1] = log(etaGs[1])
@@ -108,8 +108,8 @@ function calculateEtasZs(fk::FiniteFK{d}) where d
   pihats = Vector{SVector{d, Float64}}(undef, n)
   pis[n] = etas[n]
   pihats[n] = etahats[n]
+  Mbar = MMatrix{d, d, Float64}(undef)
   for p = n-1:-1:1
-    Mbar = MMatrix{d, d, Float64}()
     for i = 1:d
       Mbar[i,:] = etahats[p] .* fk.Ms[p][:,i] ./ etas[p+1][i]
     end
@@ -160,7 +160,7 @@ function allGammas(ffkout::FiniteFKOut{d}, fv::SVector{d, Float64},
 end
 
 function convertFunction(f::F, d::Int64) where F<:Function
-  fv = MVector{d, Float64}()
+  fv = MVector{d, Float64}(undef)
   v = Int64Particle()
   for i = 1:d
     v.x = i
@@ -219,7 +219,7 @@ end
 
 function _Qpqf(fk::FiniteFK{d}, p::Int64, q::Int64,
   f::SVector{d, Float64}) where d
-  result = MVector{d, Float64}()
+  result = MVector{d, Float64}(undef)
   for x = 1:d
     result[x] = _Qpqf(fk, x, p, q, f)
   end

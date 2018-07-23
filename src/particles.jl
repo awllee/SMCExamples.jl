@@ -3,6 +3,7 @@
 module Particles
 
 using StaticArrays
+import Compat.undef
 
 mutable struct Int64Particle
   x::Int64
@@ -14,16 +15,9 @@ mutable struct Float64Particle
   Float64Particle() = new()
 end
 
-if VERSION.minor == 7
-  struct MVFloat64Particle{d}
-    x::MVector{d, Float64}
-    MVFloat64Particle{d}() where d = new(MVector{d, Float64}(undef))
-  end
-else
-  struct MVFloat64Particle{d}
-    x::MVector{d, Float64}
-    MVFloat64Particle{d}() where d = new(MVector{d, Float64}())
-  end
+struct MVFloat64Particle{d}
+  x::MVector{d, Float64}
+  MVFloat64Particle{d}() where d = new(MVector{d, Float64}(undef))
 end
 
 end

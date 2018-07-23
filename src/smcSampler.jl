@@ -18,7 +18,7 @@ module SMCSampler
 using SequentialMonteCarlo
 using StaticArrays
 
-import Compat.Nothing
+import Compat: undef, Nothing
 using Compat.LinearAlgebra
 using Compat.Random
 
@@ -138,7 +138,7 @@ end
 struct SMCSScratch{d}
   tmp::MVector{d, Float64}
 end
-SMCSScratch{d}() where d = SMCSScratch{d}(MVector{d, Float64}())
+SMCSScratch{d}() where d = SMCSScratch{d}(MVector{d, Float64}(undef))
 
 ## for fixed-dimensional states
 function makeRWSMCSampler(d::Int64, mu, lpibar0, lpibar1, betas::Vector{Float64},

@@ -32,10 +32,10 @@ function kalmanMV(theta::MVLGTheta, ys::Vector{SVector{d,Float64}}) where d
   filteringMeans = Vector{MVector{d,Float64}}(undef, n)
   filteringVariances = Vector{MMatrix{d,d,Float64}}(undef, n)
   logZhats = Vector{Float64}(undef, n)
-  mutt1 = MVector{d,Float64}()
-  mutt = MVector{d,Float64}()
-  sigmatt1 = MMatrix{d,d,Float64}()
-  sigmatt = MMatrix{d,d,Float64}()
+  mutt1 = MVector{d,Float64}(undef)
+  mutt = MVector{d,Float64}(undef)
+  sigmatt1 = MMatrix{d,d,Float64}(undef)
+  sigmatt = MMatrix{d,d,Float64}(undef)
   lZ = 0.0
   for p = 1:n
     if p == 1

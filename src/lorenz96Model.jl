@@ -22,8 +22,8 @@ struct LorenzScratch{d}
   t1::MVector{d, Float64}
   t2::MVector{d, Float64}
 end
-LorenzScratch{d}() where d = LorenzScratch{d}(MVector{d, Float64}(),
-  MVector{d, Float64}())
+LorenzScratch{d}() where d = LorenzScratch{d}(MVector{d, Float64}(undef),
+  MVector{d, Float64}(undef))
 
 @inline function lorenz(F::Float64, x::MVector{d, Float64},
   z::MVector{d, Float64}) where d
