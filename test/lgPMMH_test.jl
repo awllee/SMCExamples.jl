@@ -4,13 +4,13 @@ using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
 using MonteCarloMarkovKernels
 using StaticArrays
 using Compat.Test
-import Compat.Nothing
+import Compat: undef, Nothing
 using Compat.Random
 using Compat.LinearAlgebra
 import Compat.Statistics.mean
 
 setSMCRNGs(0)
-lgModel, theta, ys, ko = defaultLGModel(100)
+lgModel, theta, ys, ko = defaultLGModel(10)
 
 const truex0 = theta.x0
 const truev0 = theta.v0
@@ -51,7 +51,7 @@ function makelgkalmanltd(ys::Vector{Float64})
   end
 end
 
-logtargetSMC = makelgsmcltd(ys, 1024, Threads.nthreads())
+logtargetSMC = makelgsmcltd(ys, 128, Threads.nthreads())
 logtargetKalman = makelgkalmanltd(ys)
 
 PSMC = makeAMKernel(logtargetSMC, sigmaProp)
@@ -59,12 +59,12 @@ PKalman = makeAMKernel(logtargetKalman, sigmaProp)
 
 srand(12345)
 
-chainSMC = Vector{SVector{3, Float64}}(1024*16)
-simulateChain!(chainSMC, PSMC, t0)
+chainSMC = Vector{SVector{3, Float64}}(undef, 1024*32)
+simulateChainProgress!(chainSMC, PSMC, t0)
 
-chainKalman = Vector{SVector{3, Float64}}(1024*1024)
+chainKalman = Vector{SVector{3, Float64}}(undef, 1024*1024)
 simulateChain!(chainKalman, PKalman, t0)
 
-@test mean(chainSMC) ≈ mean(chainKalman) atol=0.2
+@test mean(chainSMC) ≈ mean(chainKalman) rtol=0.1
 @test MonteCarloMarkovKernels.cov(chainSMC) ≈
-  MonteCarloMarkovKernels.cov(chainKalman) atol=0.2
+  MonteCarloMarkovKernels.cov(chainKalman) rtol=0.1
