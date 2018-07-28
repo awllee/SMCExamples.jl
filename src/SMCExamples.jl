@@ -12,11 +12,6 @@ if VERSION.minor < 7
   MMatrix{d, d, Float64}(::UndefInitializer) where d = MMatrix{d, d, Float64}()
 end
 
-# temporary
-RNG = SMCRNG
-getRNG = getSMCRNG
-setRNGs = setSMCRNGs
-
 include("particles.jl")
 include("lgModel.jl")
 include("mvlgModel.jl")
