@@ -1,8 +1,9 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.SMCSampler: defaultSMCSampler, defaultSMCSampler1D
 using Compat.Test
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, ltarget = defaultSMCSampler()
 n = model.maxn

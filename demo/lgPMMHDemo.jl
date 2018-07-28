@@ -9,7 +9,7 @@ import Compat.Nothing
 Plots.gr()
 !isinteractive() && (ENV["GKSwstype"] = "100")
 
-setSMCRNGs(0)
+setRNGs(0)
 lgModel, theta, ys, ko = defaultLGModel(100)
 
 const truex0 = theta.x0

@@ -2,7 +2,7 @@ using SequentialMonteCarlo
 import SMCExamples.LinearGaussian.defaultLGModel
 import SMCExamples.Particles.Float64Particle
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, theta, ys, ko = defaultLGModel(100)
 

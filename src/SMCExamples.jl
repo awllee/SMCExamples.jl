@@ -3,6 +3,7 @@ __precompile__()
 module SMCExamples
 
 using SequentialMonteCarlo
+using RNGPool
 using StaticArrays
 
 import Compat.UndefInitializer

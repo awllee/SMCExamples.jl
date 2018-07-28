@@ -2,7 +2,7 @@ using SequentialMonteCarlo
 using SMCExamples.MVLinearGaussian
 using StaticArrays
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, theta, ys, ko = MVLinearGaussian.defaultMVLGModel(2, 100)
 

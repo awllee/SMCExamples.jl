@@ -31,7 +31,7 @@ function makeLGAPFModel(theta::LGTheta, ys::Vector{Float64})
     p == 1 && (v += lG1)
     return v
   end
-  @inline function M!(newParticle::Float64Particle, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::Float64Particle, rng::RNG, p::Int64,
     particle::Float64Particle, ::Nothing)
     if p == 1
       newParticle.x = mu1 + sqrtv0RoverRC2v0*randn(rng)

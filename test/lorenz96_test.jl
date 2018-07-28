@@ -1,8 +1,9 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.Lorenz96: defaultLorenzModel, LorenzTheta, makeLorenzModel
 using Compat.Test
 
-setSMCRNGs(0)
+setRNGs(0)
 
 N = 2^10
 n = 10

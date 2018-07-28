@@ -3,7 +3,7 @@ import SMCExamples.LinearGaussian.defaultLGModel
 
 include("test.jl")
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, theta, ys, ko = defaultLGModel(10)
 println(ko.logZhats)

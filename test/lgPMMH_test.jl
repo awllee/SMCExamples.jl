@@ -1,4 +1,5 @@
 using SequentialMonteCarlo
+using RNGPool
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
 using MonteCarloMarkovKernels
@@ -9,7 +10,7 @@ using Compat.Random
 using Compat.LinearAlgebra
 import Compat.Statistics.mean
 
-setSMCRNGs(0)
+setRNGs(0)
 lgModel, theta, ys, ko = defaultLGModel(10)
 
 const truex0 = theta.x0

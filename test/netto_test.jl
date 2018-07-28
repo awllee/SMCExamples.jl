@@ -1,8 +1,9 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.Netto.defaultNettoModel
 using Compat.Test
 
-setSMCRNGs(0)
+setRNGs(0)
 
 N = 8192
 n = 10

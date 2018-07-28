@@ -5,7 +5,7 @@ using StaticArrays
 using Plots
 Plots.gr()
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, theta, ys, ko = MVLinearGaussian.defaultMVLGModel(2, 10)
 

@@ -36,7 +36,7 @@ function makeLGLOPModel(theta::LGTheta, ys::Vector{Float64})
       return logncG - v * invRC2Qover2 * v
     end
   end
-  @inline function M!(newParticle::LGLOPParticle, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::LGLOPParticle, rng::RNG, p::Int64,
     particle::LGLOPParticle, ::Nothing)
     if p == 1
       newParticle.x = mu1 + sqrtv0RoverRC2v0*randn(rng)

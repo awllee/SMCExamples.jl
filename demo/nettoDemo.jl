@@ -3,7 +3,7 @@ import SMCExamples.Netto.defaultNettoModel
 
 include("test.jl")
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, theta, ys = defaultNettoModel(10)
 

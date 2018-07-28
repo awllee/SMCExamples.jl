@@ -5,6 +5,7 @@
 module Lorenz96
 
 using SequentialMonteCarlo
+using RNGPool
 using StaticArrays
 import SMCExamples.Particles.MVFloat64Particle
 using Compat.Random
@@ -57,7 +58,7 @@ function makeLorenzModel(theta::LorenzTheta,
     return r
   end
   ## Euler--Maruyama
-  @inline function M!(newParticle::MVFloat64Particle{d}, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::MVFloat64Particle{d}, rng::RNG, p::Int64,
     particle::MVFloat64Particle{d}, scratch::LorenzScratch{d})
     if p == 1
       randn!(rng, newParticle.x)
@@ -82,7 +83,7 @@ function simulateLorenzModel(theta::LorenzTheta, d::Int64, n::Int64)
   ys = Vector{SVector{d, Float64}}(undef, n)
   xParticle = MVFloat64Particle{d}()
   xScratch = LorenzScratch{d}()
-  rng = getSMCRNG()
+  rng = getRNG()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, xScratch)
     ys[p] = xParticle.x + theta.δ * randn(rng, d)

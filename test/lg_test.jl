@@ -1,9 +1,10 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel, kalmanlogZ
 using Compat.Test
 
-setSMCRNGs(0)
+setRNGs(0)
 
 N = 32768
 n = 10

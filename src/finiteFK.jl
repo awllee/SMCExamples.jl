@@ -4,6 +4,7 @@
 module FiniteFeynmanKac
 
 using SequentialMonteCarlo
+using RNGPool
 using StaticArrays
 import SMCExamples.Particles.Int64Particle
 import Compat: undef, Nothing, findall
@@ -40,7 +41,7 @@ let
     @inline function lG(p::Int64, particle::Int64Particle, ::Nothing)
       @inbounds return lGVectors[p][particle.x]
     end
-    @inline function M!(newParticle::Int64Particle, rng::SMCRNG, p::Int64,
+    @inline function M!(newParticle::Int64Particle, rng::RNG, p::Int64,
       particle::Int64Particle, ::Nothing)
       if p == 1
         newParticle.x = sample(mu, rand(rng))
@@ -54,7 +55,7 @@ let
 end
 
 function randomFiniteFK(d::Int64, n::Int64)
-  rng = getSMCRNG()
+  rng = getRNG()
 
   mu = rand(rng, d)
   mu ./= sum(mu)

@@ -2,7 +2,7 @@ using SequentialMonteCarlo
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel
 
-setSMCRNGs(0)
+setRNGs(0)
 
 n = 1000
 modelBootstrap, theta, ys, ko = defaultLGModel(n)

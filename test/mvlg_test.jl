@@ -1,8 +1,9 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.MVLinearGaussian.defaultMVLGModel
 using Compat.Test
 
-setSMCRNGs(0)
+setRNGs(0)
 
 N = 2^16
 n = 10

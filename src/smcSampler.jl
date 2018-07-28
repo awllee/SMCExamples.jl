@@ -16,6 +16,7 @@
 module SMCSampler
 
 using SequentialMonteCarlo
+using RNGPool
 using StaticArrays
 
 import Compat: undef, Nothing
@@ -53,7 +54,7 @@ function makeRWSMCSampler(mu, lpibar0, lpibar1, betas::Vector{Float64},
     @inbounds return (betas[p + 1] - betas[p]) *
       (particle.lpibar1 - particle.lpibar0);
   end
-  @inline function M!(newParticle::SMCSP, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::SMCSP, rng::RNG, p::Int64,
     particle::SMCSP, ::Nothing)
     if p == 1
       newParticle.x = mu(rng)
@@ -106,7 +107,7 @@ function defaultSMCSampler1D()
   sqrtv0::Float64 = sqrt(v0)
 
   lpibar0 = makenormlogpdf(x0, v0)
-  @inline function mu(rng::SMCRNG)
+  @inline function mu(rng::RNG)
     return x0 + sqrtv0 * randn(rng)
   end
 
@@ -153,7 +154,7 @@ function makeRWSMCSampler(d::Int64, mu, lpibar0, lpibar1, betas::Vector{Float64}
     end
     return (betas[p + 1] - betas[p]) * (particle.lpibar1 - particle.lpibar0);
   end
-  @inline function M!(newParticle::SMCSamplerParticle{d1}, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::SMCSamplerParticle{d1}, rng::RNG, p::Int64,
     particle::SMCSamplerParticle{d1}, scratch::SMCSScratch{d1}) where d1
     if p == 1
       newParticle.x = mu(rng, scratch)
@@ -206,7 +207,7 @@ function defaultSMCSampler()
   A0 = SMatrix{2, 2, Float64}(mychol(Σ0))
 
   lpibar0 = makelogMVN(μ0, Σ0)
-  @inline function mu(rng::SMCRNG, scratch::SMCSScratch{2})
+  @inline function mu(rng::RNG, scratch::SMCSScratch{2})
     randn!(rng, scratch.tmp)
     return μ0 + A0 * scratch.tmp
   end

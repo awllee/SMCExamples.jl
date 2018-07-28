@@ -4,7 +4,7 @@ using StaticArrays
 
 include("test.jl")
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, ltarget = defaultSMCSampler()
 

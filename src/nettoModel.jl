@@ -6,6 +6,7 @@
 module Netto
 
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.Particles.Float64Particle
 
 import Compat: Nothing, undef
@@ -26,7 +27,7 @@ function makeNettoModel(theta::NettoTheta, ys::Vector{Float64})
     v::Float64 = tmp - ys[p]
     return logncG - v * invδ²over2 * v
   end
-  @inline function M!(newParticle::Float64Particle, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::Float64Particle, rng::RNG, p::Int64,
     particle::Float64Particle, ::Nothing)
     if p == 1
       newParticle.x = σ*randn(rng)
@@ -43,7 +44,7 @@ function simulateNettoModel(theta::NettoTheta, n::Int64)
   model = makeNettoModel(theta, Vector{Float64}(undef, 0))
   ys = Vector{Float64}(undef, n)
   xParticle = Float64Particle()
-  rng = getSMCRNG()
+  rng = getRNG()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, nothing)
     ys[p] = xParticle.x*xParticle.x/20.0 + sqrt(theta.σ²)*randn(rng)

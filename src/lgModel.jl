@@ -3,6 +3,7 @@
 module LinearGaussian
 
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.Particles.Float64Particle
 import Compat: undef, Nothing
 
@@ -25,7 +26,7 @@ function makeLGModel(theta::LGTheta, ys::Vector{Float64})
     @inbounds v::Float64 = theta.C*particle.x - ys[p]
     return logncG - v * invRover2 * v
   end
-  @inline function M!(newParticle::Float64Particle, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::Float64Particle, rng::RNG, p::Int64,
     particle::Float64Particle, ::Nothing)
     if p == 1
       newParticle.x = theta.x0 + sqrtv0*randn(rng)
@@ -40,7 +41,7 @@ function simulateLGModel(theta::LGTheta, n::Int64)
   model = makeLGModel(theta, Vector{Float64}(undef, 0))
   ys = Vector{Float64}(undef, n)
   xParticle = Float64Particle()
-  rng = getSMCRNG()
+  rng = getRNG()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, nothing)
     ys[p] = theta.C*xParticle.x + sqrt(theta.R)*randn(rng)

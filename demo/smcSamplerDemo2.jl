@@ -4,7 +4,7 @@ using StaticArrays
 using Plots
 Plots.gr()
 
-setSMCRNGs(0)
+setRNGs(0)
 
 model, ltarget = defaultSMCSampler()
 

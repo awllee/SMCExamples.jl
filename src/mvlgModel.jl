@@ -3,6 +3,7 @@
 module MVLinearGaussian
 
 using SequentialMonteCarlo
+using RNGPool
 using StaticArrays
 import SMCExamples.Particles.MVFloat64Particle
 using Compat.LinearAlgebra
@@ -53,7 +54,7 @@ function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
     mul!(scratch.t1, invRover2, scratch.t2)
     return logncG - dot(scratch.t1,scratch.t2)
   end
-  @inline function M!(newParticle::MVFloat64Particle{d}, rng::SMCRNG, p::Int64,
+  @inline function M!(newParticle::MVFloat64Particle{d}, rng::RNG, p::Int64,
     particle::MVFloat64Particle{d}, scratch::MVLGPScratch{d})
     if p == 1
       randn!(rng, scratch.t1)
@@ -76,7 +77,7 @@ function simulateMVLGModel(theta::MVLGTheta{d}, n::Int64) where d
   xScratch = MVLGPScratch{d}()
   # cholR = chol(theta.R)'
   cholR = mychol(theta.R)
-  rng = getSMCRNG()
+  rng = getRNG()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, xScratch)
     ys[p] = theta.C*(xParticle.x) + cholR * randn(rng,d)
