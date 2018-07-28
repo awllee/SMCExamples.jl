@@ -1,4 +1,5 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.SMCSampler.defaultSMCSampler
 using StaticArrays
 using Plots

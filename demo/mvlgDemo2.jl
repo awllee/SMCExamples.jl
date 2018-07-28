@@ -1,4 +1,5 @@
 using SequentialMonteCarlo
+using RNGPool
 using SMCExamples.MVLinearGaussian
 using StaticArrays
 

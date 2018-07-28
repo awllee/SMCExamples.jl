@@ -1,4 +1,5 @@
 using SequentialMonteCarlo
+using RNGPool
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel
 

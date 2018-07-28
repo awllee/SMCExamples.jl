@@ -1,4 +1,5 @@
 using SequentialMonteCarlo
+using RNGPool
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
 import MonteCarloMarkovKernels: simulateChain!, makeAMKernel, kde, estimateBM

@@ -1,4 +1,5 @@
 using SequentialMonteCarlo
+using RNGPool
 using SMCExamples.MVLinearGaussian
 import SMCExamples.Particles.MVFloat64Particle
 using StaticArrays
