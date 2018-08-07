@@ -16,6 +16,11 @@ smc!(model, smcio)
 
 @test smcio.logZhats ≈ ffkout.logZhats atol=0.2
 
+lM = FiniteFeynmanKac.makelM(ffk)
+p1 = smcio.internal.zetaAncs[1]
+p2 = smcio.zetas[1]
+lM(n, p1, p2, smcio.internal.particleScratch)
+
 ## just test that the commands run; actual testing is part of the tests in
 ## SequentialMonteCarlo.jl
 

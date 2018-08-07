@@ -37,6 +37,20 @@ function makeLGModel(theta::LGTheta, ys::Vector{Float64})
   return SMCModel(M!, lG, n, Float64Particle, Nothing)
 end
 
+function makelM(theta::LGTheta)
+  tQ::Float64 = theta.Q
+  negInvQover2::Float64 = -0.5/tQ
+  tA::Float64 = theta.A
+  @inline function lM(::Int64, particle::Float64Particle,
+    newParticle::Float64Particle, ::Nothing)
+    x::Float64 = particle.x
+    y::Float64 = newParticle.x
+    t::Float64 = tA*x - y
+    return negInvQover2 * t * t
+  end
+  return lM
+end
+
 function simulateLGModel(theta::LGTheta, n::Int64)
   model = makeLGModel(theta, Vector{Float64}(undef, 0))
   ys = Vector{Float64}(undef, n)

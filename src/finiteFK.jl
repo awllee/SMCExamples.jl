@@ -54,6 +54,25 @@ let
   end
 end
 
+function makelM(ffk::FiniteFeynmanKac.FiniteFK{d}) where d
+  n::Int64 = length(ffk.Gs)
+  lMs::Matrix{SVector{d, Float64}} = Matrix{SVector{d, Float64}}(undef, n-1, d)
+  for p in 1:n-1
+    for i = 1:d
+      lMs[p, i] = log.(ffk.Ms[p][i, :])
+    end
+  end
+  @inline function lM(p::Int64, particle::Int64Particle, newParticle::Int64Particle,
+    ::Nothing)
+    x::Int64 = particle.x
+    y::Int64 = newParticle.x
+    @inbounds lMpx::SVector{d, Float64} = lMs[p-1, x]
+    @inbounds v::Float64 = lMpx[y]
+    return v
+  end
+  return lM
+end
+
 function randomFiniteFK(d::Int64, n::Int64)
   rng = getRNG()
 
