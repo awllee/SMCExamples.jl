@@ -1,4 +1,4 @@
-__precompile__()
+VERSION < v"0.7-" && __precompile__()
 
 module SMCExamples
 
@@ -7,7 +7,7 @@ using RNGPool
 using StaticArrays
 
 import Compat.UndefInitializer
-if VERSION.minor < 7
+if VERSION < v"0.7-"
   MVector{d, Float64}(::UndefInitializer) where d = MVector{d, Float64}()
   MMatrix{d, d, Float64}(::UndefInitializer) where d = MMatrix{d, d, Float64}()
 end

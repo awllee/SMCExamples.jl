@@ -23,7 +23,7 @@ import Compat: undef, Nothing
 using Compat.LinearAlgebra
 using Compat.Random
 
-if VERSION.minor == 7
+if VERSION >= v"0.7-"
   function mychol(A)
     return cholesky(A).L
   end

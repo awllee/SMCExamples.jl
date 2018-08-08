@@ -10,9 +10,9 @@ using Compat.LinearAlgebra
 using Compat.Random
 using Compat
 
-if VERSION.minor == 6 mul! = A_mul_B! end
+if VERSION < v"0.7-" mul! = A_mul_B! end
 
-if VERSION.minor == 7
+if VERSION >= v"0.7-"
   function mychol(A)
     return cholesky(A).L
   end
