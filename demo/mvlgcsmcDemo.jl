@@ -14,14 +14,14 @@ nsamples = 2^14
 
 smcio = SMCIO{model.particle, model.pScratch}(16, model.maxn, 1, true, 2.0)
 
-v = Vector{MVFloat64Particle{2}}(10)
+v = Vector{MVFloat64Particle{2}}(undef, 10)
 for p = 1:10
   v[p] = MVFloat64Particle{2}()
   v[p].x .= zeros(MVector{2, Float64})
 end
 
 function smoothingMeans(model, smcio, m, v)
-  tmp = Vector{MVector{2,Float64}}(10)
+  tmp = Vector{MVector{2,Float64}}(undef, 10)
   for p = 1:10
     tmp[p] = zeros(MVector{2, Float64})
   end

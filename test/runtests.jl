@@ -1,4 +1,4 @@
-using Compat.Test
+using Test
 
 @testset "Finite FK Model tests" begin
   include("ffk_test.jl")

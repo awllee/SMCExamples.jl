@@ -5,7 +5,6 @@ module LinearGaussian
 using SequentialMonteCarlo
 using RNGPool
 import SMCExamples.Particles.Float64Particle
-import Compat: undef, Nothing
 
 struct LGTheta
   A::Float64

@@ -1,7 +1,7 @@
 using SequentialMonteCarlo
 using RNGPool
 using SMCExamples.FiniteFeynmanKac
-using Compat.Test
+using Test
 
 setRNGs(0)
 

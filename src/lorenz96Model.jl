@@ -8,8 +8,7 @@ using SequentialMonteCarlo
 using RNGPool
 using StaticArrays
 import SMCExamples.Particles.MVFloat64Particle
-using Compat.Random
-import Compat.undef
+using Random
 
 struct LorenzTheta
   σ::Float64

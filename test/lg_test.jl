@@ -2,7 +2,7 @@ using SequentialMonteCarlo
 using RNGPool
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel, kalmanlogZ, makelM
-using Compat.Test
+using Test
 
 setRNGs(0)
 

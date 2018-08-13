@@ -4,11 +4,10 @@ using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
 using MonteCarloMarkovKernels
 using StaticArrays
-using Compat.Test
-import Compat: undef, Nothing
-using Compat.Random
-using Compat.LinearAlgebra
-import Compat.Statistics.mean
+using Test
+using Random
+using LinearAlgebra
+import Statistics.mean
 
 setRNGs(0)
 lgModel, theta, ys, ko = defaultLGModel(10)
@@ -58,13 +57,11 @@ logtargetKalman = makelgkalmanltd(ys)
 PSMC = makeAMKernel(logtargetSMC, sigmaProp)
 PKalman = makeAMKernel(logtargetKalman, sigmaProp)
 
-srand(12345)
+Random.seed!(12345)
 
-chainSMC = Vector{SVector{3, Float64}}(undef, 1024*32)
-simulateChainProgress!(chainSMC, PSMC, t0)
+chainSMC = simulateChainProgress(PSMC, t0, 1024*32)
 
-chainKalman = Vector{SVector{3, Float64}}(undef, 1024*1024)
-simulateChain!(chainKalman, PKalman, t0)
+chainKalman = simulateChain(PKalman, t0, 1024*1024)
 
 @test mean(chainSMC) ≈ mean(chainKalman) rtol=0.1
 @test MonteCarloMarkovKernels.cov(chainSMC) ≈

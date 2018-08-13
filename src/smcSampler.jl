@@ -18,20 +18,8 @@ module SMCSampler
 using SequentialMonteCarlo
 using RNGPool
 using StaticArrays
-
-import Compat: undef, Nothing
-using Compat.LinearAlgebra
-using Compat.Random
-
-if VERSION >= v"0.7-"
-  function mychol(A)
-    return cholesky(A).L
-  end
-else
-  function mychol(A)
-    return chol(Symmetric(A))'
-  end
-end
+using LinearAlgebra
+using Random
 
 ## one-dimensional state
 mutable struct SMCSP
@@ -204,7 +192,7 @@ function defaultSMCSampler()
 
   μ0 = SVector{2, Float64}(0.0, 0.0)
   Σ0 = SMatrix{2, 2, Float64}(100.0, 0.0, 0.0, 100.0)
-  A0 = SMatrix{2, 2, Float64}(mychol(Σ0))
+  A0 = SMatrix{2, 2, Float64}(cholesky(Σ0).L)
 
   lpibar0 = makelogMVN(μ0, Σ0)
   @inline function mu(rng::RNG, scratch::SMCSScratch{2})

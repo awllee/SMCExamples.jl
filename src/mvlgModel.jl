@@ -6,21 +6,8 @@ using SequentialMonteCarlo
 using RNGPool
 using StaticArrays
 import SMCExamples.Particles.MVFloat64Particle
-using Compat.LinearAlgebra
-using Compat.Random
-using Compat
-
-if VERSION < v"0.7-" mul! = A_mul_B! end
-
-if VERSION >= v"0.7-"
-  function mychol(A)
-    return cholesky(A).L
-  end
-else
-  function mychol(A)
-    return chol(Symmetric(A))'
-  end
-end
+using LinearAlgebra
+using Random
 
 struct MVLGTheta{d}
   A::SMatrix{d, d, Float64}
@@ -42,8 +29,7 @@ MVLGPScratch{d}() where d = MVLGPScratch{d}(MVector{d, Float64}(undef),
 function makeMVLGModel(theta::MVLGTheta, ys::Vector{SVector{d, Float64}}) where
   d
   n = length(ys)
-  # cholQ = chol(theta.Q)'
-  cholQ = SMatrix{d, d, Float64}(mychol(theta.Q))
+  cholQ = SMatrix{d, d, Float64}(cholesky(theta.Q).L)
   invRover2 = 0.5 * inv(theta.R)
   sqrtv0 = sqrt.(theta.v0)
   logncG = - 0.5 * d * log(2 * π) - 0.5 * logdet(theta.R)
@@ -75,8 +61,7 @@ function simulateMVLGModel(theta::MVLGTheta{d}, n::Int64) where d
   ys = Vector{SVector{d, Float64}}(undef, n)
   xParticle = MVFloat64Particle{d}()
   xScratch = MVLGPScratch{d}()
-  # cholR = chol(theta.R)'
-  cholR = mychol(theta.R)
+  cholR = cholesky(theta.R).L
   rng = getRNG()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, xScratch)
@@ -100,8 +85,8 @@ function defaultMVLGModel(d::Int64, n::Int64)
   tC = toeplitz(d, 0.5, 1.2)
   tQ = toeplitz(d, 0.2, 0.6)
   tR = toeplitz(d, 0.3, 1.5)
-  tx0 = SVector{d,Float64}(Compat.range(1, step=1, length=d))
-  tv0 = SVector{d,Float64}(Compat.range(2, step=1, length=d))
+  tx0 = SVector{d,Float64}(range(1, step=1, length=d))
+  tv0 = SVector{d,Float64}(range(2, step=1, length=d))
   theta = MVLGTheta(tA, tQ, tC, tR, tx0, tv0)
   ys = simulateMVLGModel(theta, n)
 

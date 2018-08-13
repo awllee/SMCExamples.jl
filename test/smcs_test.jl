@@ -1,7 +1,7 @@
 using SequentialMonteCarlo
 using RNGPool
 import SMCExamples.SMCSampler: defaultSMCSampler, defaultSMCSampler1D
-using Compat.Test
+using Test
 
 setRNGs(0)
 

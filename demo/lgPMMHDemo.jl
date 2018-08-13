@@ -2,13 +2,14 @@ using SequentialMonteCarlo
 using RNGPool
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
-import MonteCarloMarkovKernels: simulateChain!, makeAMKernel, kde, estimateBM
+import MonteCarloMarkovKernels: simulateChainProgress, simulateChain,
+  makeAMKernel, kde, estimateBM
 using StaticArrays
 using StatsBase
+using LinearAlgebra
+using Random
 using Plots
-import Compat.Nothing
 Plots.gr()
-!isinteractive() && (ENV["GKSwstype"] = "100")
 
 setRNGs(0)
 lgModel, theta, ys, ko = defaultLGModel(100)
@@ -58,29 +59,17 @@ logtargetKalman = makelgkalmanltd(ys)
 PSMC = makeAMKernel(logtargetSMC, sigmaProp)
 PKalman = makeAMKernel(logtargetKalman, sigmaProp)
 
-srand(12345)
-chainSMC = Vector{SVector{3, Float64}}(2^6)
-simulateChain!(chainSMC, PSMC, t0)
-chainSMC = Vector{SVector{3, Float64}}(2^15)
-@time simulateChain!(chainSMC, PSMC, t0)
+Random.seed!(12345)
+chainSMC = simulateChainProgress(PSMC, t0, 2^15)
 sar = PSMC(:acceptanceRate)
 
-chainKalman = Vector{SVector{3, Float64}}(2^6)
-simulateChain!(chainKalman, PKalman, t0)
-chainKalman = Vector{SVector{3, Float64}}(2^20)
-@time simulateChain!(chainKalman, PKalman, t0)
+@time chainKalman = simulateChain(PKalman, t0, 2^20)
 kar = PKalman(:acceptanceRate)
 
 savefigures = false
 
-vsKalman = Vector{Vector{Float64}}(3)
-for i = 1:3
-  vsKalman[i] = (x->x[i]).(chainKalman)
-end
-vsSMC = Vector{Vector{Float64}}(3)
-for i = 1:3
-  vsSMC[i] = (x->x[i]).(chainSMC)
-end
+vsKalman = (i->(x->x[i]).(chainKalman)).(1:3)
+vsSMC =  (i->(x->x[i]).(chainSMC)).(1:3)
 
 plot(kde(vsSMC[1], sar))
 plot!(kde(vsKalman[1], kar))

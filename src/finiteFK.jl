@@ -7,7 +7,6 @@ using SequentialMonteCarlo
 using RNGPool
 using StaticArrays
 import SMCExamples.Particles.Int64Particle
-import Compat: undef, Nothing, findall
 
 struct FiniteFK{d}
   mu::SVector{d, Float64}

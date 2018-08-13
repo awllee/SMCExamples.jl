@@ -3,7 +3,6 @@
 module Particles
 
 using StaticArrays
-import Compat.undef
 
 mutable struct Int64Particle
   x::Int64

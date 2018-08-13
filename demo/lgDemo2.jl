@@ -2,6 +2,7 @@ using SequentialMonteCarlo
 using RNGPool
 import SMCExamples.LinearGaussian.defaultLGModel
 import SMCExamples.Particles.Float64Particle
+import Statistics: mean, var
 
 setRNGs(0)
 
@@ -29,14 +30,14 @@ println("Estimate: $filtVarSMC")
 
 println("Running many particle filters with only 128 particles in parallel...")
 m = 10000
-lZs = Vector{Float64}(m)
-Vs = Vector{Float64}(m)
-lZhats = Vector{Float64}(m)
-Vhats = Vector{Float64}(m)
+lZs = Vector{Float64}(undef, m)
+Vs = Vector{Float64}(undef, m)
+lZhats = Vector{Float64}(undef, m)
+Vhats = Vector{Float64}(undef, m)
 f1(p::Float64Particle) = 1.0
 
 nthreads = Threads.nthreads()
-smcios = Vector{SMCIO}(nthreads)
+smcios = Vector{SMCIO}(undef, nthreads)
 Threads.@threads for i = 1:nthreads
   smcios[i] = SMCIO{model.particle, model.pScratch}(128, model.maxn, 1, true)
 end
@@ -50,15 +51,15 @@ end
 end
 
 print("Empirical relative variance of Z_n^N: ")
-println(var(exp.(lZs-ko.logZhats[smcio.n-1])))
+println(var(exp.(lZs.-ko.logZhats[smcio.n-1])))
 print("Mean of unbiased estimator of relative variance of Z_n^N: ")
-println(mean(Vs .* exp.(2*(lZs-ko.logZhats[smcio.n-1]))))
+println(mean(Vs .* exp.(2*(lZs.-ko.logZhats[smcio.n-1]))))
 print("Estimated standard deviation of the value above: ")
-println(sqrt(var(Vs .* exp.(2*(lZs-ko.logZhats[smcio.n-1])))/m))
+println(sqrt(var(Vs .* exp.(2*(lZs.-ko.logZhats[smcio.n-1])))/m))
 
-print("Empirical relative variance of \hat{Z}_n^N: ")
-println(var(exp.(lZhats-ko.logZhats[smcio.n])))
-print("Mean of unbiased estimator of relative variance of \hat{Z}_n^N: ")
-println(mean(Vhats .* exp.(2*(lZhats-ko.logZhats[smcio.n]))))
+print("Empirical relative variance of \\hat{Z}_n^N: ")
+println(var(exp.(lZhats.-ko.logZhats[smcio.n])))
+print("Mean of unbiased estimator of relative variance of \\hat{Z}_n^N: ")
+println(mean(Vhats .* exp.(2*(lZhats.-ko.logZhats[smcio.n]))))
 print("Estimated standard deviation of the value above: ")
-println(sqrt(var(Vhats .* exp.(2*(lZhats-ko.logZhats[smcio.n])))/m))
+println(sqrt(var(Vhats .* exp.(2*(lZhats.-ko.logZhats[smcio.n])))/m))

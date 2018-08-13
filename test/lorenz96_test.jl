@@ -1,7 +1,7 @@
 using SequentialMonteCarlo
 using RNGPool
 import SMCExamples.Lorenz96: defaultLorenzModel, LorenzTheta, makeLorenzModel
-using Compat.Test
+using Test
 
 setRNGs(0)
 

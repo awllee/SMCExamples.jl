@@ -9,8 +9,6 @@ using SequentialMonteCarlo
 using RNGPool
 import SMCExamples.Particles.Float64Particle
 
-import Compat: Nothing, undef
-
 struct NettoTheta
   σ²::Float64
   δ²::Float64

@@ -1,4 +1,4 @@
-import Compat.LinearAlgebra.diagm
+import LinearAlgebra.diagm
 
 ## Kalman filter for multivariate linear Gaussian models
 
