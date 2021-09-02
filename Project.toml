@@ -10,6 +10,7 @@ StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
 
 [compat]
 RNGPool = "2"
+SequentialMonteCarlo = "0.6"
 StaticArrays = "1"
 julia = "1"
 
