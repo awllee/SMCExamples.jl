@@ -273,7 +273,7 @@ function vpns(fk::FiniteFK{d}, fkout::FiniteFKOut, f::SVector{d, Float64},
   hat::Bool, centred::Bool, resample::Vector{Bool},
   n::Int64 = length(fk.Gs)) where d
   if centred
-    return vpns(fk, fkout, f - eta(fkout, f, hat, n), hat, false, resample, n)
+    return vpns(fk, fkout, f .- eta(fkout, f, hat, n), hat, false, resample, n)
   end
   if hat
     return vpns(fk, fkout, f .* fk.Gs[n] / fkout.etaGs[n], false, false,
