@@ -27,3 +27,7 @@ end
 @testset "PMMH tests" begin
   include("lgPMMH_test.jl")
 end
+
+@testset "Stochastic Volatility tests" begin
+  include("sv_test.jl")
+end
