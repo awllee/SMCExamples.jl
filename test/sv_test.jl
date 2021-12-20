@@ -1,5 +1,5 @@
 using SequentialMonteCarlo
-import SequentialMonteCarlo: V, eta
+import SequentialMonteCarlo.eta
 using RNGPool
 import SMCExamples.StochVolatility.defaultSVModel
 using Test
