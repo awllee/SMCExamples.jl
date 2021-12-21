@@ -30,3 +30,13 @@ filtering_means         = [estimate_mean(guided=false, filtering=true) for _ in 
 
 @test mean(guided_predictive_means) ≈ mean(predictive_means) atol=0.05
 
+smcio = SMCIO{model.particle, model.pScratch}(N, n, nt, false)
+smc!(model, smcio)
+
+smcio_guided = SMCIO{guidedmodel.particle, guidedmodel.pScratch}(N, n, nt, false)
+smc!(guidedmodel, smcio_guided)
+
+smcio.logZhats
+smcio_guided.logZhats
+
+@test smcio.logZhats ≈ smcio_guided.logZhats atol=0.05

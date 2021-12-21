@@ -52,15 +52,15 @@ function makeguidedSVModel(theta::SVTheta, ys::Vector{Float64}; guide=false)
     end
     @inline function lG(p::Int64, particle::GuidedSVParticle, ::Nothing)
         @inbounds y::Float64 = ys[p]
-        loggp::Float64 = -0.5*(particle.x + y^2/exp(particle.x))
+        loggp::Float64 = log2pi -0.5*(particle.x + y^2/exp(particle.x))
         v::Float64 = if p == 1
             theta.μ
         else
             theta.μ + theta.ρ*(particle.xprev - theta.μ)
         end
-        logfp::Float64 = -0.5*(particle.x - v)^2/theta.σ^2
+        logfp::Float64 = log2pi -0.5*(particle.x - v)^2/theta.σ^2
         ξ::Float64 = computeξ(p, particle.xprev)
-        logqp::Float64 = -0.5*(particle.x - ξ)^2/theta.σ^2
+        logqp::Float64 = log2pi -0.5*(particle.x - ξ)^2/theta.σ^2
         return logfp + loggp - logqp
     end
     @inline function M!(newParticle::GuidedSVParticle, rng::RNG, p::Int64,
