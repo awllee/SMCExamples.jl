@@ -1,10 +1,10 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.LinearGaussian.defaultLGModel
 import SMCExamples.Particles.Float64Particle
 import Statistics: mean, var
 
-setRNGs(0)
+Random.seed!(0)
 
 model, theta, ys, ko = defaultLGModel(100)
 

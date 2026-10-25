@@ -1,5 +1,5 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
 import MonteCarloMarkovKernels: simulateChainProgress, simulateChain,
@@ -7,11 +7,10 @@ import MonteCarloMarkovKernels: simulateChainProgress, simulateChain,
 using StaticArrays
 using StatsBase
 using LinearAlgebra
-using Random
 using Plots
 Plots.gr()
 
-setRNGs(0)
+Random.seed!(0)
 lgModel, theta, ys, ko = defaultLGModel(100)
 
 const truex0 = theta.x0

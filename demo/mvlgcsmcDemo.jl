@@ -1,12 +1,12 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 using SMCExamples.MVLinearGaussian
 import SMCExamples.Particles.MVFloat64Particle
 using StaticArrays
 using Plots
 Plots.gr()
 
-setRNGs(0)
+Random.seed!(0)
 
 model, theta, ys, ko = MVLinearGaussian.defaultMVLGModel(2, 10)
 

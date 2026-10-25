@@ -1,10 +1,10 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel, kalmanlogZ, makelM
 using Test
 
-setRNGs(0)
+Random.seed!(0)
 
 N = 32768
 n = 10

@@ -1,10 +1,10 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.LinearGaussian.defaultLGModel
 
 include("test.jl")
 
-setRNGs(0)
+Random.seed!(0)
 
 model, theta, ys, ko = defaultLGModel(10)
 println(ko.logZhats)

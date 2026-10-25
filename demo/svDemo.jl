@@ -1,10 +1,10 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.StochVolatility.defaultSVModel
 
 include("test.jl")
 
-setRNGs(0)
+Random.seed!(0)
 
 model, guidedmodel, theta, ys = defaultSVModel(10)
 

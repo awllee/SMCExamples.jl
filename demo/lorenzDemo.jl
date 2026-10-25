@@ -1,11 +1,11 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 using SMCExamples.Lorenz96
 using StaticArrays
 
 include("test.jl")
 
-setRNGs(0)
+Random.seed!(0)
 
 model, theta, ys = Lorenz96.defaultLorenzModel(8, 100)
 

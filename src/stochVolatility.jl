@@ -5,7 +5,7 @@
 
 module StochVolatility
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.Particles.Float64Particle
 
 struct SVTheta
@@ -27,7 +27,7 @@ function makeSVModel(theta::SVTheta, ys::Vector{Float64})
         @inbounds v::Float64 = particle.x + ys[p]^2 / exp(particle.x)
         return log2pi - 0.5 * v
     end
-    @inline function M!(newParticle::Float64Particle, rng::RNG, p::Int64,
+    @inline function M!(newParticle::Float64Particle, rng::AbstractRNG, p::Int64,
         particle::Float64Particle, ::Nothing)
         if p == 1
             newParticle.x = theta.μ + theta.σ*randn(rng)
@@ -63,7 +63,7 @@ function makeguidedSVModel(theta::SVTheta, ys::Vector{Float64}; guide=false)
         logqp::Float64 = log2pi -0.5*(particle.x - ξ)^2/theta.σ^2
         return logfp + loggp - logqp
     end
-    @inline function M!(newParticle::GuidedSVParticle, rng::RNG, p::Int64,
+    @inline function M!(newParticle::GuidedSVParticle, rng::AbstractRNG, p::Int64,
         particle::GuidedSVParticle, ::Nothing)
         newParticle.xprev = particle.x
         ξ::Float64 = computeξ(p, particle.x)
@@ -76,7 +76,7 @@ function simulateSVModel(theta::SVTheta, n::Int64)
   model = makeSVModel(theta, Vector{Float64}(undef, 0))
   ys = Vector{Float64}(undef, n)
   xParticle = Float64Particle()
-  rng = getRNG()
+  rng = Random.default_rng()
   for p in 1:n
     model.M!(xParticle, rng, p, xParticle, nothing)
     ys[p] = exp(xParticle.x)*randn(rng)

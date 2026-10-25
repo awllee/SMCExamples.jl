@@ -1,9 +1,9 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.MVLinearGaussian.defaultMVLGModel
 using Test
 
-setRNGs(0)
+Random.seed!(0)
 
 N = 2^16
 n = 10

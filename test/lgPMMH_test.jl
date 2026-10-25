@@ -1,15 +1,14 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 using SMCExamples.LinearGaussian: LGTheta, Float64Particle, kalmanlogZ,
   defaultLGModel, makeLGModel
 using MonteCarloMarkovKernels
 using StaticArrays
 using Test
-using Random
 using LinearAlgebra
 import Statistics.mean
 
-setRNGs(0)
+Random.seed!(0)
 lgModel, theta, ys, ko = defaultLGModel(10)
 
 const truex0 = theta.x0

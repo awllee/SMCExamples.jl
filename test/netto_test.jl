@@ -1,9 +1,9 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.Netto.defaultNettoModel
 using Test
 
-setRNGs(0)
+Random.seed!(0)
 
 N = 8192
 n = 10

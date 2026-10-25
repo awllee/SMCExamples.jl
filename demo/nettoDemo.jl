@@ -1,10 +1,10 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.Netto.defaultNettoModel
 
 include("test.jl")
 
-setRNGs(0)
+Random.seed!(0)
 
 model, theta, ys = defaultNettoModel(10)
 

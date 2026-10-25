@@ -12,3 +12,10 @@ Some of the models in src/ are also used to test SequentialMonteCarlo.jl, partic
 The demos in demo/ can be run as scripts or in the REPL. Some involve plotting. They are intended only to show how to run the algorithm and look at some of its outputs.
 
 The tests in test/ also demonstrate some aspects of usage.
+
+## Migration to 0.7
+
+Requires Julia 1.10 or later and SequentialMonteCarlo 0.7. Model callbacks now
+accept `Random.AbstractRNG` and random draws use `Random.default_rng()`.
+Use `using Random; Random.seed!(seed)` in place of RNGPool's `setRNGs(seed)`.
+Random streams differ from previous versions.

@@ -1,9 +1,9 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.LinearGaussian: defaultLGModel, makeLGLOPModel,
   makeLGAPFModel
 
-setRNGs(0)
+Random.seed!(0)
 
 n = 1000
 modelBootstrap, theta, ys, ko = defaultLGModel(n)

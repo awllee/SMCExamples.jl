@@ -1,9 +1,9 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 using SMCExamples.FiniteFeynmanKac
 using Test
 
-setRNGs(0)
+Random.seed!(0)
 
 d = 3
 n = 10

@@ -1,11 +1,11 @@
 using SequentialMonteCarlo
 import SequentialMonteCarlo.eta
-using RNGPool
+using Random
 import SMCExamples.StochVolatility.defaultSVModel
 using Test
 import Statistics: std, mean
 
-setRNGs(0)
+Random.seed!(0)
 
 N = 32768
 n = 10

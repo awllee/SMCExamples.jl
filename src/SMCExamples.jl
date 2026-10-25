@@ -1,7 +1,7 @@
 module SMCExamples
 
 using SequentialMonteCarlo
-using RNGPool
+using Random
 using StaticArrays
 
 include("particles.jl")

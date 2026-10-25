@@ -1,9 +1,9 @@
 using SequentialMonteCarlo
-using RNGPool
+using Random
 import SMCExamples.Lorenz96: defaultLorenzModel, LorenzTheta, makeLorenzModel
 using Test
 
-setRNGs(0)
+Random.seed!(0)
 
 N = 2^10
 n = 10
